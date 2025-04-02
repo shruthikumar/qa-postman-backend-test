@@ -1,0 +1,8 @@
+site_name: qa-enterprise-sdk-backend-test
+site_description: sdk test automation suite
+
+nav:
+  - Introduction: index.md
+
+plugins:
+  - techdocs-core

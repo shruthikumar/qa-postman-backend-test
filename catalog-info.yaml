@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: qa-enterprise-sdk-backend-test
+  description: |
+    sdk test automation suite
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+    github.com/project-slug: truecaller/qa-enterprise-sdk-backend-test
+    github.com/team-slug: truecaller/enterprise-qa
+spec:
+  type: automated-test-suite
+  owner: group:github-enterprise-qa
+  lifecycle: production
+  system: qa
