@@ -1,0 +1,334 @@
+package sdk.enterprise.Client;
+
+import java.util.Map;
+import java.util.Properties;
+
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import org.apache.http.HttpStatus;
+import sdk.enterprise.Entities.RequestEntities.LoginRequest;
+import sdk.enterprise.FrameworkException.APIFrameworkException;
+
+import static io.restassured.RestAssured.given;
+
+
+public class RestClient {
+
+    private RequestSpecBuilder specBuilder;
+
+    private Properties prop;
+    private String baseURI;
+
+
+    /**
+     * Initializes a new User with a name and age
+     *
+     * @param prop    takes property file
+     * @param baseURI takes base uri
+     */
+    public RestClient(Properties prop, String baseURI) {
+        specBuilder = new RequestSpecBuilder();
+        this.prop = prop;
+        this.baseURI = baseURI;
+    }
+
+    /**
+     * Add Authorization header with Bearer Token
+     */
+    public void addAuthorizationHeader() {
+        specBuilder.addHeader("Authorization", "Bearer " + getToken());
+
+    }
+
+    /**
+     * Sets the Request Content Type Based on given type
+     *
+     * @param contentType should be String mentioned in Switch
+     */
+    private void setRequestContentType(String contentType) {
+        switch (contentType.toLowerCase()) {
+            case "json":
+                specBuilder.setContentType(ContentType.JSON);
+                break;
+            case "xml":
+                specBuilder.setContentType(ContentType.XML);
+                break;
+            case "text":
+                specBuilder.setContentType(ContentType.TEXT);
+                break;
+            case "multipart":
+                specBuilder.setContentType(ContentType.MULTIPART);
+                break;
+
+            default:
+                throw new APIFrameworkException("INVALID CONTENT TYPE");
+        }
+    }
+
+    /**
+     * Create Request Specification without parameter
+     *
+     * @return Request Specification object
+     */
+    private RequestSpecification createRequestSpec() {
+        specBuilder.setBaseUri(baseURI);
+        addAuthorizationHeader();
+        return specBuilder.build();
+    }
+
+    /**
+     * Create Request Specification with specific Headers
+     *
+     * @param headersMap takes Multiple headers in key value format
+     * @return Request Specification Object
+     */
+    private RequestSpecification createRequestSpec(Map<String, String> headersMap) {
+        specBuilder.setBaseUri(baseURI);
+        addAuthorizationHeader();
+
+        if (headersMap != null) {
+            specBuilder.addHeaders(headersMap);
+        }
+        return specBuilder.build();
+    }
+
+    /**
+     * Create RequestSpecification based on given headers Map and QueryParams
+     *
+     * @param headersMap  takes Multiple  headers in the form of map
+     * @param queryParams takes Multiple Query params in the form of map
+     * @return request Specification Object
+     */
+    private RequestSpecification createRequestSpec(Map<String, String> headersMap, Map<String, Object> queryParams) {
+        specBuilder.setBaseUri(baseURI);
+
+        addAuthorizationHeader();
+
+        if (headersMap != null) {
+            specBuilder.addHeaders(headersMap);
+        }
+        if (queryParams != null) {
+            specBuilder.addQueryParams(queryParams);
+        }
+        return specBuilder.build();
+    }
+
+    /**
+     * CreateRequestSpec based on request body and content type
+     *
+     * @param requestBody takes request of type object
+     * @param contentType takes content type of type string
+     * @return request Specification object
+     */
+    private RequestSpecification createRequestSpec(Object requestBody, String contentType) {
+        specBuilder.setBaseUri(baseURI);
+        addAuthorizationHeader();
+
+        setRequestContentType(contentType);
+
+        if (requestBody != null) {
+            specBuilder.setBody(requestBody);
+        }
+        return specBuilder.build();
+    }
+
+    /**
+     * Creates Request Specification based request body and content type and Multiple headers in key value format
+     *
+     * @param requestBody takes request of object type
+     * @param contentType takes content type of String
+     * @param headersMap  takes multiple headers in key value format
+     * @return Request specification object
+     */
+    private RequestSpecification createRequestSpec(Object requestBody, String contentType, Map<String, String> headersMap) {
+        specBuilder.setBaseUri(baseURI);
+        addAuthorizationHeader();
+        setRequestContentType(contentType);
+        if (headersMap != null) {
+            specBuilder.addHeaders(headersMap);
+        }
+        if (requestBody != null) {
+            specBuilder.setBody(requestBody);
+        }
+        return specBuilder.build();
+    }
+
+
+    /**
+     * Http Method Util for Get call with service url and boolean log
+     *
+     * @param serviceUrl takes url in the form of String
+     * @param log if log required true or false
+     * @return Response object
+     */
+    public Response get(String serviceUrl, boolean log) {
+        if (log) {
+            return given(createRequestSpec()).log().all().when().get(serviceUrl);
+        }
+        return given(createRequestSpec()).when().get(serviceUrl);
+
+    }
+
+    /**
+     * Http Util for Get call with Service url and headers map and boolean log
+     *
+     * @param serviceUrl takes url in the form of String
+     * @param headersMap takes headers in form of key and value
+     * @param log        if log required true or false
+     * @return Response object
+     */
+    public Response get(String serviceUrl, Map<String, String> headersMap, boolean log) {
+
+        if (log) {
+            return given(createRequestSpec(headersMap)).log().all().when().get(serviceUrl);
+        }
+        return given(createRequestSpec(headersMap)).when().get(serviceUrl);
+    }
+
+    /**
+     * Http Util for Get Call with service url and query params in the form of map and headers with map and boolean log
+     *
+     * @param serviceUrl  takes url in the form of String
+     * @param queryParams takes queryParams in form of key and value
+     * @param headersMap  takes headers in form of key and value
+     * @param log         if log required true or false
+     * @return Response object
+     */
+    public Response get(String serviceUrl, Map<String, Object> queryParams, Map<String, String> headersMap, boolean log) {
+
+        if (log) {
+            return given(createRequestSpec(headersMap, queryParams)).log().all().when().get(serviceUrl);
+        }
+        return given(createRequestSpec(headersMap, queryParams)).when().get(serviceUrl);
+    }
+
+    /**
+     * Http Util for post call with service url,content type,request body,boolean log
+     *
+     * @param serviceUrl  takes url in the form of String
+     * @param contentType takes content type in the form of String
+     * @param requestBody takes request body in the form of object
+     * @param log         if log required true or false
+     * @return Response object
+     */
+    public Response post(String serviceUrl, String contentType, Object requestBody, boolean log) {
+        if (log) {
+            return given(createRequestSpec(requestBody, contentType)).log().all().when().post(serviceUrl);
+        }
+        return given(createRequestSpec(requestBody, contentType)).when().post(serviceUrl);
+    }
+
+    /**
+     * Http Util for post call with service url,content type,request body,headers map ,boolean log
+     *
+     * @param serviceUrl  takes url in the form of String
+     * @param contentType takes content type in the form of String
+     * @param requestBody takes request body in the form of object
+     * @param headersMap  takes header map in the form of key and value
+     * @param log         if log required true or false
+     * @return Response object
+     */
+    public Response post(String serviceUrl, String contentType, Object requestBody, Map<String, String> headersMap, boolean log) {
+        if (log) {
+            return given(createRequestSpec(requestBody, contentType, headersMap)).log().all().when().post(serviceUrl);
+        }
+        return given(createRequestSpec(requestBody, contentType, headersMap)).when().post(serviceUrl);
+    }
+
+    /**
+     * Http Util for put call with service url,content type,request body,boolean log
+     *
+     * @param serviceUrl  takes url in the form of String
+     * @param contentType takes content type in the form of String
+     * @param requestBody takes request body in the form of object
+     * @param log         if log required true or false
+     * @return Response object
+     */
+    public Response put(String serviceUrl, String contentType, Object requestBody, boolean log) {
+        if (log) {
+            return given(createRequestSpec(requestBody, contentType)).log().all().when().put(serviceUrl);
+        }
+        return given(createRequestSpec(requestBody, contentType)).when().put(serviceUrl);
+    }
+
+    /**
+     * Http Util for put call with service url,content type,request body,headers map ,boolean log
+     *
+     * @param serviceUrl  takes url in the form of String
+     * @param contentType takes content type in the form of String
+     * @param requestBody takes request body in the form of object
+     * @param headersMap  takes header map in the form of key and value
+     * @param log         if log required true or false
+     * @return Response object
+     */
+    public Response put(String serviceUrl, String contentType, Object requestBody, Map<String, String> headersMap, boolean log) {
+        if (log) {
+            return given(createRequestSpec(requestBody, contentType, headersMap)).log().all().when().put(serviceUrl);
+        }
+        return given(createRequestSpec(requestBody, contentType, headersMap)).when().put(serviceUrl);
+    }
+
+    /**
+     * Http Util for patch call with service url,content type,request body,boolean log
+     *
+     * @param serviceUrl  takes url in the form of String
+     * @param contentType takes content type in the form of String
+     * @param requestBody takes request body in the form of object
+     * @param log         if log required true or false
+     * @return Response object
+     */
+    public Response patch(String serviceUrl, String contentType, Object requestBody, boolean log) {
+        if (log) {
+            return given(createRequestSpec(requestBody, contentType)).log().all().when().patch(serviceUrl);
+        }
+        return given(createRequestSpec(requestBody, contentType)).when().patch(serviceUrl);
+    }
+
+    /**
+     * Http Util for patch call with service url,content type,request body,headers map ,boolean log
+     *
+     * @param serviceUrl  takes url in the form of String
+     * @param contentType takes content type in the form of String
+     * @param requestBody takes request body in the form of object
+     * @param headersMap  takes header map in the form of key and value
+     * @param log         if log required true or false
+     * @return Response object
+     */
+    public Response patch(String serviceUrl, String contentType, Object requestBody, Map<String, String> headersMap, boolean log) {
+        if (log) {
+            return given(createRequestSpec(requestBody, contentType, headersMap)).log().all().when().patch(serviceUrl);
+        }
+        return given(createRequestSpec(requestBody, contentType, headersMap)).when().patch(serviceUrl);
+    }
+
+    /**
+     * Http Util for delete call with service url,boolean log
+     *
+     * @param serviceUrl serviceUrl takes url in the form of String
+     * @param log        if log required true or false
+     * @return Response object
+     */
+    public Response delete(String serviceUrl, boolean log) {
+        if (log) {
+            return given(createRequestSpec()).log().all().when().delete(serviceUrl);
+        }
+        return given(createRequestSpec()).when().delete(serviceUrl);
+    }
+
+    /**
+     * Fetch the login token currently all the details are fetched property file which will refactored later on
+     *
+     * @return token as String
+     */
+
+    public String getToken() {
+        LoginRequest loginRequest = new LoginRequest(prop.getProperty("email"), prop.getProperty("password"), prop.getProperty("portal"));
+        String token = given().log().all().contentType(ContentType.JSON).body(loginRequest).when().post(prop.getProperty("tokenUrl")).then().log().all().assertThat().statusCode(HttpStatus.SC_OK).extract().path("token");
+
+        return token;
+
+    }
+
+}

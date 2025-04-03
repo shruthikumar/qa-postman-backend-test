@@ -1,0 +1,87 @@
+name: SDK API Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 3,10 * * *'
+env:
+  BUILD_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      EMAIL : ${{ secrets.EMAIL }}
+      PASSWORD : ${{ secrets.PASSWORD }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install Allure
+        run: |
+          sudo apt-add-repository ppa:qameta/allure
+          sudo apt update
+          sudo apt install allure
+
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-     
+
+      - name: Run SDK Test API Tests
+        run: mvn clean test
+
+      - name: Generate Allure Report
+        run: mvn allure:report
+
+      - name: Upload Allure Report as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-report
+          path: target/site/allure-maven/index.html
+          include-hidden-files: true
+
+      - name: Send build success notification
+        if: ${{ success() }}
+        uses: slackapi/slack-github-action@v1.24.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+        with:
+          channel-id: ${{ vars.SLACK_CHANNEL }}
+          payload: >
+            {
+              "attachments": [
+                {
+                  "color": "good",
+                  "text": "SDK APIs Automation Test is Passed: \n${{ env.BUILD_URL }}."
+                }
+              ]
+            }
+
+      - name: Notify Slack on Error
+        if: ${{ failure() && !cancelled() }}
+        uses: slackapi/slack-github-action@v1.24.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+        with:
+          channel-id: ${{ vars.SLACK_CHANNEL }}
+          payload: >
+            {
+              "attachments": [
+                {
+                  "color": "red",
+                  "text": "SDK APIs Automation Test is failed: \n${{ env.BUILD_URL }}."
+                }
+              ]
+            }

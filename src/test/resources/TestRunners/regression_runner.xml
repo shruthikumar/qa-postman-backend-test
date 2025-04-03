@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="API Regression Suite" thread-count="1"
+       parallel="tests" verbose="4">
+
+
+    <listeners>
+        <listener
+                class-name="sdk.enterprise.Listeners.ExtentReportListener"/>
+    </listeners>
+
+    <test name="ProjectServiceTest">
+        <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
+
+        <classes>
+            <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectTest"/>
+        </classes>
+    </test>
+</suite>

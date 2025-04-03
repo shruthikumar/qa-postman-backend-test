@@ -1,0 +1,1 @@
+{"uuid":"fac17a9a-4a5b-42dc-9f74-e3a9347a0b27","name":"ProjectServiceTest","children":["a7c5822b-c676-441f-a091-1c9d5534a0eb"],"befores":[{"name":"setUp","status":"passed","stage":"finished","description":"","steps":[],"attachments":[],"parameters":[],"start":1743579520173,"stop":1743579520696}],"afters":[],"start":1743579520154,"stop":1743579525432}
