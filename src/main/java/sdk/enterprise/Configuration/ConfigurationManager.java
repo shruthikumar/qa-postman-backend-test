@@ -17,21 +17,21 @@ public class ConfigurationManager {
 
         try {
             if (envName == null) {
-                input = new FileInputStream("./src/test/resources/config/qa.config.properties");
+                input = new FileInputStream("src/test/resources/Config/qa.config.properties");
             } else {
 
                 switch (envName.toLowerCase().trim()) {
                     case "qa":
-                        input = new FileInputStream("./src/test/resources/Config/qa.config.properties");
+                        input = new FileInputStream("src/test/resources/Config/qa.config.properties");
                         break;
                     case "dev":
-                        input = new FileInputStream("./src/test/resources/Config/dev.config.properties");
+                        input = new FileInputStream("src/test/resources/Config/dev.config.properties");
                         break;
                     case "stage":
-                        input = new FileInputStream("./src/test/resources/Config/stage.config.properties");
+                        input = new FileInputStream("src/test/resources/Config/stage.config.properties");
                         break;
                     case "prod":
-                        input = new FileInputStream("./src/test/resources/Config/config.properties");
+                        input = new FileInputStream("src/test/resources/Config/config.properties");
                         break;
 
                     default:

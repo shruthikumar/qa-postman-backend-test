@@ -6,7 +6,7 @@ public class StringUtils {
     private static final Faker faker = new Faker();
 
     public static String getCompanyName() {
-        return faker.company().name();
+        return faker.name().firstName();
     }
 
 }
