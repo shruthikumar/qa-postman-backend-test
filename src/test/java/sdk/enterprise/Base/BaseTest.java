@@ -2,6 +2,7 @@ package sdk.enterprise.Base;
 
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
 import sdk.enterprise.Client.RestClient;
@@ -19,7 +20,6 @@ public class BaseTest {
     protected Properties prop;
     protected RestClient restClient;
     protected String baseURI;
-
     @Parameters({"baseURI"})
     @BeforeTest
     public void setUp(String baseURI) {
@@ -27,6 +27,10 @@ public class BaseTest {
         config = new ConfigurationManager();
         prop = config.initProp();
         this.baseURI = baseURI;
-        //restClient = new RestClient(prop, baseURI);
+    }
+    @AfterTest
+    public void tearDown() {
+        //Reset RestAssured if not done per method
+        RestAssured.reset();
     }
 }
