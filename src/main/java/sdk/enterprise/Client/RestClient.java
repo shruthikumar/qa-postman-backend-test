@@ -1,5 +1,7 @@
 package sdk.enterprise.Client;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -8,6 +10,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
+import sdk.enterprise.Constants.ConstantStrings;
 import sdk.enterprise.Entities.RequestEntities.LoginRequest;
 import sdk.enterprise.FrameworkException.APIFrameworkException;
 
@@ -40,6 +43,12 @@ public class RestClient {
     public void addAuthorizationHeader() {
         specBuilder.addHeader("Authorization", "Bearer " + getToken());
 
+    }
+
+    public Map<String,String> getHeaders(String key, String value) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(key,value);
+        return headers;
     }
 
     /**
@@ -154,6 +163,24 @@ public class RestClient {
         }
         return specBuilder.build();
     }
+    /**
+     * Creates Request Specification based on  Multiple headers in key value format with file and consentRequest as String
+     *
+     * @param file takes file as input
+     * @param consentRequest takes of type String
+     * @param headersMap  takes multiple headers in key value format
+     * @return Request specification object
+     */
+    private RequestSpecification createRequestSpec(Map<String, String> headersMap, File file, String consentRequest) {
+        specBuilder.setBaseUri(baseURI);
+        addAuthorizationHeader();
+        specBuilder.addMultiPart(ConstantStrings.APP_LOGO.getMessage(),file);
+        specBuilder.addMultiPart(ConstantStrings.CONSENT_REQUEST.getMessage(), consentRequest);
+        if (headersMap != null) {
+            specBuilder.addHeaders(headersMap);
+        }
+        return specBuilder.build();
+    }
 
 
     /**
@@ -169,6 +196,23 @@ public class RestClient {
         }
         return given(createRequestSpec()).when().get(serviceUrl);
 
+    }
+
+    /**
+     * Http Method Util for Post call with Multipart Upload  with file, service url , boolean log,
+     *
+     * @param serviceUrl takes url in the form of String
+     * @param log if log required true or false
+     * @param headersMap takes headers as map
+     * @param file take file as input
+     * @param consentRequest takes as string
+     * @return Response object
+     */
+    public Response postMultiPart(String serviceUrl, Map<String, String> headersMap, File file, String consentRequest, boolean log) {
+        if (log) {
+            return given(createRequestSpec(headersMap, file, consentRequest)).log().all().when().post(serviceUrl);
+        }
+        return given(createRequestSpec(headersMap, file, consentRequest)).when().post(serviceUrl);
     }
 
     /**
