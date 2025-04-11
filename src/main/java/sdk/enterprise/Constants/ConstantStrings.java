@@ -5,9 +5,10 @@ public enum ConstantStrings {
     CONTENT_TYPE("json"),
     APP_LOGO("appLogo"),
     CONSENT_REQUEST("consentRequest"),
-    PROJECT_ID("X-Project-Id");
-
-
+    PROJECT_ID("X-Project-Id"),
+    EMAIL("EMAIL"),
+    PASSWORD("PASSWORD"),
+    PORTAL("developers_portal");
 
 
 

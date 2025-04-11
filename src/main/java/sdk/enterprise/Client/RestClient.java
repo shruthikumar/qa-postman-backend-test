@@ -45,6 +45,12 @@ public class RestClient {
 
     }
 
+    /**
+     * get the headers will set given key and value in the Map and return as Map
+     * @param key takes key as String
+     * @param value takes key as String
+     * @return headers Map
+     */
     public Map<String,String> getHeaders(String key, String value) {
         Map<String, String> headers = new HashMap<>();
         headers.put(key,value);
@@ -362,15 +368,29 @@ public class RestClient {
     }
 
     /**
-     * Fetch the login token currently all the details are fetched property file which will refactored later on
-     *
+     * Fetch the login token currently all the details are fetched property file . Use only to test the local changes
+     * Note : This function is used to fetch the token in local and request data is fetched from Property file
      * @return token as String
      */
+    public String getTokenLocal() {
+        LoginRequest loginRequest = new LoginRequest(prop.getProperty("email"), prop.getProperty("password"), ConstantStrings.PORTAL.getMessage());
+        return given().log().all().contentType(ContentType.JSON).body(loginRequest).when().post(prop.getProperty("tokenUrl")).then().log().all().assertThat().statusCode(HttpStatus.SC_OK).extract().path("token");
+    }
 
+    /**
+     * Fetch the login token, and url is fetched from Property file
+     * Note : Email and password is fetched from gitHub Secrets
+     * @return token as String
+     */
     public String getToken() {
-        LoginRequest loginRequest = new LoginRequest(prop.getProperty("email"), prop.getProperty("password"), prop.getProperty("portal"));
-        String token = given().log().all().contentType(ContentType.JSON).body(loginRequest).when().post(prop.getProperty("tokenUrl")).then().log().all().assertThat().statusCode(HttpStatus.SC_OK).extract().path("token");
+        String email = System.getenv(ConstantStrings.EMAIL.getMessage());
+        String password = System.getenv(ConstantStrings.PASSWORD.getMessage());
+        String token = null;
 
+        if (email != null && password != null) {
+            LoginRequest loginRequest = new LoginRequest(email, password, ConstantStrings.PORTAL.getMessage());
+            token = given().log().all().contentType(ContentType.JSON).body(loginRequest).when().post(prop.getProperty("tokenUrl")).then().log().all().assertThat().statusCode(HttpStatus.SC_OK).extract().path("token");
+        }
         return token;
 
     }
