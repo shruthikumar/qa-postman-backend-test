@@ -40,8 +40,8 @@ public class RestClient {
     /**
      * Add Authorization header with Bearer Token
      */
-    public void addAuthorizationHeader() {
-        specBuilder.addHeader("Authorization", "Bearer " + getToken());
+    public void addAuthorizationHeader(RequestSpecBuilder builder) {
+        builder.addHeader("Authorization", "Bearer " + getToken());
 
     }
 
@@ -88,8 +88,9 @@ public class RestClient {
      * @return Request Specification object
      */
     private RequestSpecification createRequestSpec() {
+        RequestSpecBuilder specBuilder = new RequestSpecBuilder();
         specBuilder.setBaseUri(baseURI);
-        addAuthorizationHeader();
+        addAuthorizationHeader(specBuilder);
         return specBuilder.build();
     }
 
@@ -100,8 +101,9 @@ public class RestClient {
      * @return Request Specification Object
      */
     private RequestSpecification createRequestSpec(Map<String, String> headersMap) {
+        RequestSpecBuilder specBuilder = new RequestSpecBuilder();
         specBuilder.setBaseUri(baseURI);
-        addAuthorizationHeader();
+        addAuthorizationHeader(specBuilder);
 
         if (headersMap != null) {
             specBuilder.addHeaders(headersMap);
@@ -117,9 +119,9 @@ public class RestClient {
      * @return request Specification Object
      */
     private RequestSpecification createRequestSpec(Map<String, String> headersMap, Map<String, Object> queryParams) {
+        RequestSpecBuilder specBuilder = new RequestSpecBuilder();
         specBuilder.setBaseUri(baseURI);
-
-        addAuthorizationHeader();
+        addAuthorizationHeader(specBuilder);
 
         if (headersMap != null) {
             specBuilder.addHeaders(headersMap);
@@ -138,8 +140,9 @@ public class RestClient {
      * @return request Specification object
      */
     private RequestSpecification createRequestSpec(Object requestBody, String contentType) {
+        RequestSpecBuilder specBuilder = new RequestSpecBuilder();
         specBuilder.setBaseUri(baseURI);
-        addAuthorizationHeader();
+        addAuthorizationHeader(specBuilder);
 
         setRequestContentType(contentType);
 
@@ -158,8 +161,9 @@ public class RestClient {
      * @return Request specification object
      */
     private RequestSpecification createRequestSpec(Object requestBody, String contentType, Map<String, String> headersMap) {
+        RequestSpecBuilder specBuilder = new RequestSpecBuilder();
         specBuilder.setBaseUri(baseURI);
-        addAuthorizationHeader();
+        addAuthorizationHeader(specBuilder);
         setRequestContentType(contentType);
         if (headersMap != null) {
             specBuilder.addHeaders(headersMap);
@@ -178,8 +182,9 @@ public class RestClient {
      * @return Request specification object
      */
     private RequestSpecification createRequestSpec(Map<String, String> headersMap, File file, String consentRequest) {
+        RequestSpecBuilder specBuilder = new RequestSpecBuilder();
         specBuilder.setBaseUri(baseURI);
-        addAuthorizationHeader();
+        addAuthorizationHeader(specBuilder);
         specBuilder.addMultiPart(ConstantStrings.APP_LOGO.getMessage(),file);
         specBuilder.addMultiPart(ConstantStrings.CONSENT_REQUEST.getMessage(), consentRequest);
         if (headersMap != null) {

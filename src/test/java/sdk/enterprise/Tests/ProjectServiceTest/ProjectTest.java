@@ -17,6 +17,7 @@ import sdk.enterprise.Utils.StringUtils;
 import static org.testng.Assert.assertEquals;
 
 public class ProjectTest extends BaseTest {
+
     @BeforeMethod
     public void projectSetup() {
         restClient = new RestClient(prop, baseURI);
@@ -47,8 +48,5 @@ public class ProjectTest extends BaseTest {
         assertEquals(response.getMessage(), ErrorConstants.EMPTY_NAME_ERROR__MSG);
 
     }
-
-
-
 
 }

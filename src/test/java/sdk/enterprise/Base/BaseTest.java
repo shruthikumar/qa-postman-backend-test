@@ -4,6 +4,7 @@ import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import sdk.enterprise.Client.RestClient;
 import sdk.enterprise.Configuration.ConfigurationManager;
@@ -14,6 +15,7 @@ public class BaseTest {
     //Service URLs:
     public static final String PROJECT_SERVICE_ENDPOINT = "/v1/project";
     public static final String PARTNER_SERVICE_ENDPOINT = "/v2/partner";
+    public static final String PARTNER_SERVICE_ENDPOINT_V1 = "/v1/partner/account";
 
 
     protected ConfigurationManager config;

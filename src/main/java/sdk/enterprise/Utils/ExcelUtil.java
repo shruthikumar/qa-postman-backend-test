@@ -1,14 +1,16 @@
 package sdk.enterprise.Utils;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class ExcelUtil {
-    private static final String TEST_DATA_SHEET_PATH = "./src/test/resources/TestData/APITestData.xlsx";
+    private static final String TEST_DATA_SHEET_PATH = "src/test/resources/TestData/APITestData.xlsx";
     private static Workbook book;
     private static Sheet sheet;
 
@@ -27,7 +29,10 @@ public class ExcelUtil {
                     data[i][j] = sheet.getRow(i + 1).getCell(j).toString();
                 }
             }
-        } catch (IOException e) {
+        } catch (FileNotFoundException | InvalidFormatException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
 
