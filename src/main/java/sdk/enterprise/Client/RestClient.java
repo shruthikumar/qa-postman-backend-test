@@ -47,13 +47,14 @@ public class RestClient {
 
     /**
      * get the headers will set given key and value in the Map and return as Map
-     * @param key takes key as String
+     *
+     * @param key   takes key as String
      * @param value takes key as String
      * @return headers Map
      */
-    public Map<String,String> getHeaders(String key, String value) {
+    public Map<String, String> getHeaders(String key, String value) {
         Map<String, String> headers = new HashMap<>();
-        headers.put(key,value);
+        headers.put(key, value);
         return headers;
     }
 
@@ -153,6 +154,21 @@ public class RestClient {
     }
 
     /**
+     * CreateRequestSpec based on contentType
+     *
+     * @param contentType takes content type of type string
+     * @return request Specification object
+     */
+    private RequestSpecification createRequestSpec(String contentType) {
+        RequestSpecBuilder specBuilder = new RequestSpecBuilder();
+        specBuilder.setBaseUri(baseURI);
+        addAuthorizationHeader(specBuilder);
+
+        setRequestContentType(contentType);
+        return specBuilder.build();
+    }
+
+    /**
      * Creates Request Specification based request body and content type and Multiple headers in key value format
      *
      * @param requestBody takes request of object type
@@ -173,19 +189,20 @@ public class RestClient {
         }
         return specBuilder.build();
     }
+
     /**
      * Creates Request Specification based on  Multiple headers in key value format with file and consentRequest as String
      *
-     * @param file takes file as input
+     * @param file           takes file as input
      * @param consentRequest takes of type String
-     * @param headersMap  takes multiple headers in key value format
+     * @param headersMap     takes multiple headers in key value format
      * @return Request specification object
      */
     private RequestSpecification createRequestSpec(Map<String, String> headersMap, File file, String consentRequest) {
         RequestSpecBuilder specBuilder = new RequestSpecBuilder();
         specBuilder.setBaseUri(baseURI);
         addAuthorizationHeader(specBuilder);
-        specBuilder.addMultiPart(ConstantStrings.APP_LOGO.getMessage(),file);
+        specBuilder.addMultiPart(ConstantStrings.APP_LOGO.getMessage(), file);
         specBuilder.addMultiPart(ConstantStrings.CONSENT_REQUEST.getMessage(), consentRequest);
         if (headersMap != null) {
             specBuilder.addHeaders(headersMap);
@@ -198,7 +215,7 @@ public class RestClient {
      * Http Method Util for Get call with service url and boolean log
      *
      * @param serviceUrl takes url in the form of String
-     * @param log if log required true or false
+     * @param log        if log required true or false
      * @return Response object
      */
     public Response get(String serviceUrl, boolean log) {
@@ -212,10 +229,10 @@ public class RestClient {
     /**
      * Http Method Util for Post call with Multipart Upload  with file, service url , boolean log,
      *
-     * @param serviceUrl takes url in the form of String
-     * @param log if log required true or false
-     * @param headersMap takes headers as map
-     * @param file take file as input
+     * @param serviceUrl     takes url in the form of String
+     * @param log            if log required true or false
+     * @param headersMap     takes headers as map
+     * @param file           take file as input
      * @param consentRequest takes as string
      * @return Response object
      */
@@ -290,6 +307,21 @@ public class RestClient {
             return given(createRequestSpec(requestBody, contentType, headersMap)).log().all().when().post(serviceUrl);
         }
         return given(createRequestSpec(requestBody, contentType, headersMap)).when().post(serviceUrl);
+    }
+
+    /**
+     * Http Util for post call with service url,content type,boolean log
+     *
+     * @param serviceUrl  takes url in the form of String
+     * @param contentType takes content type in the form of String
+     * @param log         if log required true or false
+     * @return Response object
+     */
+    public Response post(String serviceUrl, String contentType, boolean log) {
+        if (log) {
+            return given(createRequestSpec(contentType)).log().all().when().post(serviceUrl);
+        }
+        return given(createRequestSpec(contentType)).when().post(serviceUrl);
     }
 
     /**
@@ -375,6 +407,7 @@ public class RestClient {
     /**
      * Fetch the login token currently all the details are fetched property file . Use only to test the local changes
      * Note : This function is used to fetch the token in local and request data is fetched from Property file
+     *
      * @return token as String
      */
     public String getTokenLocal() {
@@ -385,6 +418,7 @@ public class RestClient {
     /**
      * Fetch the login token, and url is fetched from Property file
      * Note : Email and password is fetched from gitHub Secrets
+     *
      * @return token as String
      */
     public String getToken() {
@@ -399,5 +433,6 @@ public class RestClient {
         return token;
 
     }
+
 
 }

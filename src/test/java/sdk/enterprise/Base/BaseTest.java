@@ -16,12 +16,14 @@ public class BaseTest {
     public static final String PROJECT_SERVICE_ENDPOINT = "/v1/project";
     public static final String PARTNER_SERVICE_ENDPOINT = "/v2/partner";
     public static final String PARTNER_SERVICE_ENDPOINT_V1 = "/v1/partner/account";
+    public static final String PROJECT_SERVICE_PROJECT_DETAILS_ENDPOINT_V1 = "/v1/project/details";
 
 
     protected ConfigurationManager config;
     protected Properties prop;
     protected RestClient restClient;
     protected String baseURI;
+
     @Parameters({"baseURI"})
     @BeforeTest
     public void setUp(String baseURI) {
@@ -30,6 +32,7 @@ public class BaseTest {
         prop = config.initProp();
         this.baseURI = baseURI;
     }
+
     @AfterTest
     public void tearDown() {
         //Reset RestAssured if not done per method

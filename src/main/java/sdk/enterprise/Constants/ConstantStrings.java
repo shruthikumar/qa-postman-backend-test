@@ -11,7 +11,6 @@ public enum ConstantStrings {
     PORTAL("developers_portal");
 
 
-
     private final String message;
 
     ConstantStrings(String message) {
