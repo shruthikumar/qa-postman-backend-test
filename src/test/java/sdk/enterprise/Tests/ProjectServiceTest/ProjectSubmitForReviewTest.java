@@ -1,0 +1,204 @@
+package sdk.enterprise.Tests.ProjectServiceTest;
+
+import io.restassured.response.Response;
+import org.apache.http.HttpStatus;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import sdk.enterprise.Base.BaseTest;
+import sdk.enterprise.Client.RestClient;
+import sdk.enterprise.Constants.ConstantStrings;
+import sdk.enterprise.Constants.Constants;
+import sdk.enterprise.CustomAnnotations.TestCaseId;
+import sdk.enterprise.DataProvider.ExcelDataProvider;
+import sdk.enterprise.Entities.RequestEntities.*;
+import sdk.enterprise.Entities.ResponseEntities.*;
+import sdk.enterprise.Utils.JsonPathValidator;
+import sdk.enterprise.Utils.StringUtils;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.Map;
+
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
+import static sdk.enterprise.Utils.StringUtils.getFileFromResources;
+
+public class ProjectSubmitForReviewTest extends BaseTest {
+
+    @BeforeMethod
+    public void setup() {
+        restClient = new RestClient(prop, baseURI);
+    }
+
+    @Test(
+            description = "Business Should Able to Create the Project And Submit For Review",
+            dataProvider = "accountData",
+            dataProviderClass = ExcelDataProvider.class
+    )
+    @TestCaseId("SDK_TS_1")
+    public void businessShouldAbleToSubmitTheProjectForReview(String expectedPartnerId,
+                                                              String expectedEmail,
+                                                              String expectedCountry,
+                                                              String expectedContactFirstName,
+                                                              String expectedContactLastName,
+                                                              String expectedLegalBusinessName) {
+
+        // Step 1: Get Partner Account Details
+        PartnerAccountResponse partnerAccountResponse = restClient.get(PARTNER_SERVICE_ENDPOINT_V1, true)
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.SC_OK)
+                .extract().as(PartnerAccountResponse.class);
+
+        assertEquals(partnerAccountResponse.getPartnerId(), expectedPartnerId);
+        assertEquals(partnerAccountResponse.getEmail(), expectedEmail);
+        assertEquals(partnerAccountResponse.getCountry(), expectedCountry);
+        assertEquals(partnerAccountResponse.getContactFirstName(), expectedContactFirstName);
+        assertEquals(partnerAccountResponse.getContactLastName(), expectedContactLastName);
+        assertEquals(partnerAccountResponse.getLegalBusinessName(), expectedLegalBusinessName);
+
+        // Step 2: Create Project
+        ProjectRequest projectRequest = new ProjectRequest(StringUtils.getCompanyName(), ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage()
+        );
+
+        ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest, true)
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.SC_OK)
+                .extract().as(ProjectResponse.class);
+
+        String projectId = projectResponse.getId();
+        String projectName = projectRequest.getName();
+
+        // Step 3: Add Android Credentials
+        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId);
+
+        CredentialsRequest.Fingerprint fingerprint = new CredentialsRequest.Fingerprint(
+                StringUtils.getRandomFingerprint(),
+                StringUtils.getRandomLabel()
+        );
+        CredentialsRequest.Metadata metadata = new CredentialsRequest.Metadata(
+                StringUtils.getPackageName(),
+                Arrays.asList(fingerprint)
+        );
+        CredentialsRequest credentialsRequest = CredentialsRequest.builder()
+                .platform(ConstantStrings.PLATFORM.getMessage())
+                .metadata(metadata)
+                .build();
+        CredentialsResponse credentialsResponse = restClient.post(V2_CREDENTIALS, headers, credentialsRequest, true)
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.SC_OK)
+                .extract().as(CredentialsResponse.class);
+
+        String clientId = credentialsResponse.getClientId();
+
+        // Step 4: Get Credentials
+        String serviceUrl = RestClient.buildPathParamWithServiceUrl(V2_CREDENTIALS, clientId);
+
+        CredentialsResponse getCredentialsResponse = restClient.get(serviceUrl, headers, true)
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.SC_OK)
+                .extract().as(CredentialsResponse.class);
+
+        assertEquals(getCredentialsResponse.getClientId(), credentialsResponse.getClientId());
+
+        // Step 5: Get Project Details by project id
+        DetailsOfAllProjectsResponse projectDetailsResponse = restClient.get(PROJECT_SERVICE_PROJECT_DETAILS_ENDPOINT_V1, headers, true)
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.SC_OK)
+                .extract().as(DetailsOfAllProjectsResponse.class);
+
+        assertEquals(projectDetailsResponse.getId(), projectId);
+        assertEquals(projectDetailsResponse.getName(), projectName);
+
+        // Step 6: Add consent details
+        File appLogoFile = getFileFromResources(Constants.APP_LOGO_FILE_NAME);
+
+        ConsentRequest consentRequest = ConsentRequest.builder()
+                .appName(StringUtils.getCompanyName())
+                .scopes(Constants.SCOPES)
+                .userSupportEmail(StringUtils.getEmail())
+                .developerEmail(StringUtils.getEmail())
+                .developerName(StringUtils.getFullName())
+                .privacyPolicyUrl(StringUtils.getPrivacyPolicyUrl())
+                .tosUrl(StringUtils.getTosUrl())
+                .homePageUrl(StringUtils.getHomePageUrl())
+                .mandatoryScopes(Constants.MANDATORY_SCOPES)
+                .build();
+
+       String consentJson = JsonPathValidator.convertObjectToJsonString(consentRequest);
+
+        ConsentResponse consentResponse = restClient.postMultiPart(PROJECT_SERVICE_CONSENT_V1, headers, appLogoFile, consentJson, true)
+                .then().log().all()
+                .assertThat()
+                .statusCode(HttpStatus.SC_CREATED)
+                .extract().as(ConsentResponse.class);
+        assertEquals(consentResponse.getSummary(), ConstantStrings.CONSENT_SCREEN_SAVED.getMessage());
+
+        // Step 7: Fetch consent details
+        ConsentResponse getConsentResponse = restClient.get(PROJECT_SERVICE_CONSENT_V2, headers, true)
+                .then().log().all()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().as(ConsentResponse.class);
+
+        assertEquals(getConsentResponse.getAppName(), consentRequest.getAppName());
+        assertEquals(getConsentResponse.getUserSupportEmail(), consentRequest.getUserSupportEmail());
+        assertEquals(getConsentResponse.getDeveloperEmail(), consentRequest.getDeveloperEmail());
+        assertEquals(getConsentResponse.getDeveloperName(), consentRequest.getDeveloperName());
+        assertEquals(getConsentResponse.getPrivacyPolicyUrl(), consentRequest.getPrivacyPolicyUrl());
+        assertEquals(getConsentResponse.getTosUrl(), consentRequest.getTosUrl());
+        assertEquals(getConsentResponse.getHomePageUrl(), consentRequest.getHomePageUrl());
+
+        // Step 8: Add mobile number
+        TestPhoneNumberRequest testPhoneNumberRequestBody = TestPhoneNumberRequest.builder()
+                .phoneNumber(StringUtils.getRandomMobileNumber())
+                .build();
+
+        String requestBody = JsonPathValidator.convertObjectToJsonString(testPhoneNumberRequestBody);
+
+        Response testPhoneNumberResponse = restClient.post(PROJECT_TEST_PHONE_NUMBER, headers, requestBody, true)
+                .then().log().all()
+                .assertThat()
+                .statusCode(HttpStatus.SC_CREATED)
+                .extract().response();
+
+        // Step 9: Get list of phone numbers added to the project
+        String responseBody = restClient.get(PROJECT_TEST_PHONE_NUMBER, headers, true)
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.SC_OK)
+                .extract().asString();
+
+        assertTrue(responseBody.contains(String.valueOf(testPhoneNumberRequestBody.getPhoneNumber())));
+
+        // Step 10 : Add Optional Preferences / Enable optional preferences
+        OtpVerificationStatusResponse otpVerificationStatusResponse = restClient.put(V1_OTP_VERIFICATION_ACTIVATE, headers, true)
+                .then().log().all()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .as(OtpVerificationStatusResponse.class);
+
+        assertEquals(otpVerificationStatusResponse.getClientId(), clientId);
+        assertEquals(otpVerificationStatusResponse.getStatus(), ConstantStrings.STATUS_ACTIVE.getMessage());
+
+//         Step 11: Verification Prepare
+        VerificationPrepareResponse verificationPrepareResponse = restClient.post(V2_VERIFICATION_PREPARE, headers, true)
+                .then().log().all()
+                .assertThat().statusCode(HttpStatus.SC_OK)
+                .extract().as(VerificationPrepareResponse.class);
+
+        assertEquals(verificationPrepareResponse.getId(), projectId);
+        assertEquals(verificationPrepareResponse.getAppName(), consentRequest.getAppName());
+
+        // Step 12 : Submit for review
+        OptionalPreferencesRequest optionalPreferencesRequestBody = OptionalPreferencesRequest.builder()
+                .partnerComments(StringUtils.getRandomParagraph())
+                .build();
+
+         restClient.post(V2_VERIFICATION_SUBMIT, headers, optionalPreferencesRequestBody, true)
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK);
+    }
+}
+

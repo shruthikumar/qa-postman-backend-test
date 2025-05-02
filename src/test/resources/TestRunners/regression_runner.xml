@@ -9,19 +9,25 @@
                 class-name="sdk.enterprise.Listeners.ExtentReportListener"/>
     </listeners>
 
-    <test name="ProjectServiceTest">
-        <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
-        <classes>
-            <class name= "sdk.enterprise.Tests.ProjectServiceTest.ProjectTest"/>
-        </classes>
-    </test>
-
     <test name="PartnerServiceTest">
         <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
         <classes>
-            <class name= "sdk.enterprise.Tests.PartnerServiceTest.PartnerTest"/>
+            <class name="sdk.enterprise.Tests.PartnerServiceTest.PartnerTest"/>
         </classes>
     </test>
 
+    <test name="ProjectSubmitForReviewTest">
+        <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
+        <classes>
+            <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectSubmitForReviewTest"/>
+        </classes>
+    </test>
+
+    <test name="ProjectServiceTest">
+        <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
+        <classes>
+            <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectTest"/>
+        </classes>
+    </test>
 
 </suite>

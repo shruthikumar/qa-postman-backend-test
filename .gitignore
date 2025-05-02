@@ -1,0 +1,47 @@
+# Maven target directory
+target/
+
+# Logs
+*.log
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+
+# VS Code
+.vscode/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Test reports
+/allure-results/
+/allure-report/
+
+# Temporary files
+*.tmp
+*.swp
+
+# Java specific
+*.class
+
+# Build tools
+dependency-reduced-pom.xml
+buildNumber.properties
+release.properties
+
+# Code coverage
+jacoco.exec
+/site/
+coverage/
+
+# Environment files
+.env

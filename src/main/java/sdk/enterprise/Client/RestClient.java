@@ -1,16 +1,15 @@
 package sdk.enterprise.Client;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
 import sdk.enterprise.Constants.ConstantStrings;
+import sdk.enterprise.Constants.Constants;
 import sdk.enterprise.Entities.RequestEntities.LoginRequest;
 import sdk.enterprise.FrameworkException.APIFrameworkException;
 
@@ -26,7 +25,7 @@ public class RestClient {
 
 
     /**
-     * Initializes a new User with a name and age
+     * Initializes a new RestClient with prop and baseUri
      *
      * @param prop    takes property file
      * @param baseURI takes base uri
@@ -113,6 +112,24 @@ public class RestClient {
     }
 
     /**
+     * Builds a clean URL path by joining individual segments.
+     * Trims any leading or trailing slashes from each segment and joins them with a single slash.
+     *
+     * @param segments The individual path segments to be joined together.
+     * @return A normalized URL path starting with a single
+     */
+    public static String buildPathParamWithServiceUrl(String serviceUrl,String... segments) {
+        StringBuilder path = new StringBuilder();
+        for (String segment : segments) {
+            if (segment != null) {
+                segment = segment.replaceAll("^/+", "").replaceAll("/+$", "");
+                path.append("/").append(segment);
+            }
+        }
+        return serviceUrl + path;
+    }
+
+    /**
      * Create RequestSpecification based on given headers Map and QueryParams
      *
      * @param headersMap  takes Multiple  headers in the form of map
@@ -150,6 +167,28 @@ public class RestClient {
         if (requestBody != null) {
             specBuilder.setBody(requestBody);
         }
+        return specBuilder.build();
+    }
+    /**
+     * CreateRequestSpec based on request body and content type
+     *
+     * @param requestBody takes request of type object
+     * @param headersMap takes map as key and value
+     * @return request Specification object
+     */
+    private RequestSpecification createRequestSpec(Object requestBody, Map<String, String> headersMap) {
+        RequestSpecBuilder specBuilder = new RequestSpecBuilder();
+        specBuilder.setBaseUri(baseURI);
+        addAuthorizationHeader(specBuilder);
+
+        if (headersMap != null && !headersMap.isEmpty()) {
+            specBuilder.addHeaders(headersMap);
+        }
+
+        if (requestBody != null) {
+            specBuilder.setBody(requestBody);
+        }
+
         return specBuilder.build();
     }
 
@@ -202,7 +241,7 @@ public class RestClient {
         RequestSpecBuilder specBuilder = new RequestSpecBuilder();
         specBuilder.setBaseUri(baseURI);
         addAuthorizationHeader(specBuilder);
-        specBuilder.addMultiPart(ConstantStrings.APP_LOGO.getMessage(), file);
+        specBuilder.addMultiPart(ConstantStrings.APP_LOGO.getMessage(),file, Constants.MIME_TYPE_PNG);
         specBuilder.addMultiPart(ConstantStrings.CONSENT_REQUEST.getMessage(), consentRequest);
         if (headersMap != null) {
             specBuilder.addHeaders(headersMap);
@@ -259,22 +298,6 @@ public class RestClient {
         return given(createRequestSpec(headersMap)).when().get(serviceUrl);
     }
 
-    /**
-     * Http Util for Get Call with service url and query params in the form of map and headers with map and boolean log
-     *
-     * @param serviceUrl  takes url in the form of String
-     * @param queryParams takes queryParams in form of key and value
-     * @param headersMap  takes headers in form of key and value
-     * @param log         if log required true or false
-     * @return Response object
-     */
-    public Response get(String serviceUrl, Map<String, Object> queryParams, Map<String, String> headersMap, boolean log) {
-
-        if (log) {
-            return given(createRequestSpec(headersMap, queryParams)).log().all().when().get(serviceUrl);
-        }
-        return given(createRequestSpec(headersMap, queryParams)).when().get(serviceUrl);
-    }
 
     /**
      * Http Util for post call with service url,content type,request body,boolean log
@@ -290,6 +313,38 @@ public class RestClient {
             return given(createRequestSpec(requestBody, contentType)).log().all().when().post(serviceUrl);
         }
         return given(createRequestSpec(requestBody, contentType)).when().post(serviceUrl);
+    }
+
+    /**
+     *  * Http Util for Get Call with service url and query params in the form of map and headers with map and boolean log
+     * @param serviceUrl takes url in the form of String
+     * @param queryParams takes queryParams in form of key and value
+     * @param headersMap takes headers in form of key and value
+     * @param log if log required true or false
+     * @return Response object
+     */
+    public Response get(String serviceUrl, Map<String, Object> queryParams, Map<String, String> headersMap, boolean log) {
+        if (log) {
+            return given(createRequestSpec(headersMap, queryParams)).log().all().when().get(serviceUrl);
+        }
+        return given(createRequestSpec(headersMap, queryParams)).when().get(serviceUrl);
+    }
+
+    /**
+     * Http Util for post call with service url,headersMap,request body,boolean log
+     *
+     * @param serviceUrl  takes url in the form of String
+     * @param headersMap  takes headersMap in the form of key and values
+     * @param requestBody takes request body in the form of object
+     * @param log         if log required true or false
+     * @return Response object
+     */
+
+    public Response post(String serviceUrl, Map<String, String> headersMap, Object requestBody, boolean log) {
+        if (log) {
+            return given(createRequestSpec(requestBody, headersMap)).log().all().when().post(serviceUrl);
+        }
+        return given(createRequestSpec(requestBody, headersMap)).when().post(serviceUrl);
     }
 
     /**
@@ -310,6 +365,21 @@ public class RestClient {
     }
 
     /**
+     * Http Util for post call with service url,headers map ,boolean log
+     *
+     * @param serviceUrl takes url in the form of String
+     * @param headersMap takes header map in the form of key and value
+     * @param log        if log required true or false
+     * @return Response object
+     */
+    public Response post(String serviceUrl, Map<String, String> headersMap, boolean log) {
+        if (log) {
+            return given(createRequestSpec(headersMap)).log().all().when().post(serviceUrl);
+        }
+        return given(createRequestSpec(headersMap)).when().post(serviceUrl);
+    }
+
+    /**
      * Http Util for post call with service url,content type,boolean log
      *
      * @param serviceUrl  takes url in the form of String
@@ -327,10 +397,10 @@ public class RestClient {
     /**
      * Http Util for put call with service url,content type,request body,boolean log
      *
-     * @param serviceUrl  takes url in the form of String
+     * @param serviceUrl   takes url in the form of String
      * @param contentType takes content type in the form of String
      * @param requestBody takes request body in the form of object
-     * @param log         if log required true or false
+     * @param log          if log required true or false
      * @return Response object
      */
     public Response put(String serviceUrl, String contentType, Object requestBody, boolean log) {
@@ -338,6 +408,20 @@ public class RestClient {
             return given(createRequestSpec(requestBody, contentType)).log().all().when().put(serviceUrl);
         }
         return given(createRequestSpec(requestBody, contentType)).when().put(serviceUrl);
+    }
+    /**
+     * Http Util for put call with service url,content type,request body,boolean log
+     *
+     * @param serviceUrl takes url in the form of String
+     * @param headersMap takes headers in the form of key and value
+     * @param log        if log required true or false
+     * @return Response object
+     */
+    public Response put(String serviceUrl, Map<String, String> headersMap, boolean log) {
+        if (log) {
+            return given(createRequestSpec(headersMap)).log().all().when().put(serviceUrl);
+        }
+        return given(createRequestSpec(headersMap)).when().put(serviceUrl);
     }
 
     /**
@@ -433,6 +517,4 @@ public class RestClient {
         return token;
 
     }
-
-
 }

@@ -17,6 +17,13 @@ public class BaseTest {
     public static final String PARTNER_SERVICE_ENDPOINT = "/v2/partner";
     public static final String PARTNER_SERVICE_ENDPOINT_V1 = "/v1/partner/account";
     public static final String PROJECT_SERVICE_PROJECT_DETAILS_ENDPOINT_V1 = "/v1/project/details";
+    public static final String V2_CREDENTIALS = "/v2/credentials";
+    public static final String PROJECT_SERVICE_CONSENT_V1 = "/v1/project/consent";
+    public static final String PROJECT_SERVICE_CONSENT_V2=   "/v2/project/consent";
+    public static final String PROJECT_TEST_PHONE_NUMBER = "/v1/project/testphonenumber";
+    public static final String V1_OTP_VERIFICATION_ACTIVATE =  "v1/otp/verification/activate";
+    public static final String V2_VERIFICATION_PREPARE = "/v2/verification/prepare";
+    public static final String V2_VERIFICATION_SUBMIT =  "/v2/verification/submit";
 
 
     protected ConfigurationManager config;

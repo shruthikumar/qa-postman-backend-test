@@ -2,6 +2,7 @@ package sdk.enterprise.Utils;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
+import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
 import sdk.enterprise.FrameworkException.APIFrameworkException;
 
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class JsonPathValidator {
+    private static final ObjectMapper mapper = new ObjectMapper();
     private String getJsonResponseAsString(Response response) {
         return response.getBody().asString();
     }
@@ -45,6 +47,14 @@ public class JsonPathValidator {
         catch(PathNotFoundException e) {
             e.printStackTrace();
             throw new APIFrameworkException(jsonPath + "is not found...");
+        }
+    }
+
+    public static String convertObjectToJsonString(Object obj) {
+        try {
+            return mapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to convert to JSON string", e);
         }
     }
 }

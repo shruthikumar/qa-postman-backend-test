@@ -8,7 +8,11 @@ public enum ConstantStrings {
     PROJECT_ID("X-Project-Id"),
     EMAIL("EMAIL"),
     PASSWORD("PASSWORD"),
-    PORTAL("developers_portal");
+    PORTAL("developers_portal"),
+    PLATFORM("Android"),
+    MODE("test"),
+    STATUS_ACTIVE("active"),
+    CONSENT_SCREEN_SAVED("Consent screen saved");
 
 
     private final String message;
