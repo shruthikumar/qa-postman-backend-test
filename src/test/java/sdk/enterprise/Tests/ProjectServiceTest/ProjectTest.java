@@ -29,9 +29,8 @@ public class ProjectTest extends BaseTest {
     public void businessShouldAbleToCreateProject() {
         ProjectRequest project = new ProjectRequest(StringUtils.getCompanyName(),
                 ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
-        restClient.post(PROJECT_SERVICE_ENDPOINT, ConstantStrings.CONTENT_TYPE.getMessage(), project, true)
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.SC_OK)
+        restClient.post(PROJECT_SERVICE_ENDPOINT, ConstantStrings.CONTENT_TYPE.getMessage(), project)
+                .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(ProjectResponse.class);
     }
 
@@ -40,9 +39,8 @@ public class ProjectTest extends BaseTest {
     public void shouldThrowErrorForEmptyNameInCreateProject() {
         ProjectRequest project = new ProjectRequest("", ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
         ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT,
-                        ConstantStrings.CONTENT_TYPE.getMessage(), project, true)
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
+                        ConstantStrings.CONTENT_TYPE.getMessage(), project)
+                .then().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);
         assertEquals(response.getStatus(), ErrorCodes.EMPTY_NAME_ERROR_CODE);
         assertEquals(response.getMessage(), ErrorConstants.EMPTY_NAME_ERROR__MSG);
@@ -54,9 +52,8 @@ public class ProjectTest extends BaseTest {
     public void ShouldThrowErrorForEmptyBusinessCategoryInCreateProject() {
         ProjectRequest project = new ProjectRequest(StringUtils.getCompanyName(), "");
         ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT,
-                        ConstantStrings.CONTENT_TYPE.getMessage(), project, true)
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
+                        ConstantStrings.CONTENT_TYPE.getMessage(), project)
+                .then().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);
         assertEquals(response.getStatus(), ErrorCodes.EMPTY_NAME_ERROR_CODE);
         assertEquals(response.getMessage(), ErrorConstants.EMPTY_NAME_ERROR__MSG);
@@ -68,9 +65,8 @@ public class ProjectTest extends BaseTest {
     public void ShouldThrowErrorForEmptyNameAndEmptyBusinessCategoryInCreateProject() {
         ProjectRequest project = new ProjectRequest("", "");
         ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT,
-                        ConstantStrings.CONTENT_TYPE.getMessage(), project, true)
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
+                        ConstantStrings.CONTENT_TYPE.getMessage(), project)
+                .then().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);
         assertEquals(response.getStatus(), ErrorCodes.EMPTY_NAME_ERROR_CODE);
         assertEquals(response.getMessage(), ErrorConstants.EMPTY_NAME_ERROR__MSG);
@@ -82,14 +78,13 @@ public class ProjectTest extends BaseTest {
     public void ShouldThrowErrorForDuplicateNameInCreateProject() {
         String projectName = StringUtils.getCompanyName();
         ProjectRequest project = new ProjectRequest(projectName, ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
-        restClient.post(PROJECT_SERVICE_ENDPOINT, ConstantStrings.CONTENT_TYPE.getMessage(), project, true)
-                .then().log().all();
+        restClient.post(PROJECT_SERVICE_ENDPOINT, ConstantStrings.CONTENT_TYPE.getMessage(), project)
+                .then().statusCode(HttpStatus.SC_OK);
 
         ProjectRequest duplicateProject = new ProjectRequest(projectName, ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
         ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT,
-                        ConstantStrings.CONTENT_TYPE.getMessage(), duplicateProject, true)
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
+                        ConstantStrings.CONTENT_TYPE.getMessage(), duplicateProject)
+                .then().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);
         assertEquals(response.getStatus(), ErrorCodes.DUPLICATE_NAME_ERROR_CODE);
         assertEquals(response.getMessage(), ErrorConstants.DUPLICATE_NAME_MSG);
@@ -99,9 +94,8 @@ public class ProjectTest extends BaseTest {
     @TestCaseId("SDK_TC_014")
     public void ShouldThrowErrorForEmptyBodyRequestInCreateProject() {
         ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT,
-                        ConstantStrings.CONTENT_TYPE.getMessage(), true)
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
+                        ConstantStrings.CONTENT_TYPE.getMessage())
+                .then().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);
         assertEquals(response.getStatus(), ErrorCodes.INVALID_JSON_DATA_ERROR_CODE);
         assertEquals(response.getMessage(), ErrorConstants.INVALID_JSON_DATA_MSG);

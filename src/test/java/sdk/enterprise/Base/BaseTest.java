@@ -2,10 +2,10 @@ package sdk.enterprise.Base;
 
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
+import io.restassured.filter.log.LogDetail;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import org.testng.annotations.*;
 import sdk.enterprise.Client.RestClient;
 import sdk.enterprise.Configuration.ConfigurationManager;
 

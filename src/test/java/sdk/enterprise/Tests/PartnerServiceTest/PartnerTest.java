@@ -27,9 +27,8 @@ public class PartnerTest extends BaseTest {
                                                              String contactLastName,
                                                              String legalBusinessName)
     {
-        PartnerAccountResponse partnerResponse = restClient.get(PARTNER_SERVICE_ENDPOINT_V1, true)
-                .then().log().all()
-                .assertThat().statusCode(HttpStatus.SC_OK)
+        PartnerAccountResponse partnerResponse = restClient.get(PARTNER_SERVICE_ENDPOINT_V1)
+                .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(PartnerAccountResponse.class);
 
         assertEquals(partnerResponse.getPartnerId(), partnerId);
