@@ -29,5 +29,4 @@
             <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectTest"/>
         </classes>
     </test>
-
 </suite>

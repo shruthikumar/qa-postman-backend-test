@@ -29,7 +29,7 @@ public class ProjectTest extends BaseTest {
     public void businessShouldAbleToCreateProject() {
         ProjectRequest project = new ProjectRequest(StringUtils.getCompanyName(),
                 ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
-        restClient.post(PROJECT_SERVICE_ENDPOINT, ConstantStrings.CONTENT_TYPE.getMessage(), project)
+        restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), project)
                 .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(ProjectResponse.class);
     }
@@ -38,7 +38,7 @@ public class ProjectTest extends BaseTest {
     @TestCaseId("SDK_TC_015")
     public void shouldThrowErrorForEmptyNameInCreateProject() {
         ProjectRequest project = new ProjectRequest("", ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
-        ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT,
+        ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT_V1,
                         ConstantStrings.CONTENT_TYPE.getMessage(), project)
                 .then().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);
@@ -51,7 +51,7 @@ public class ProjectTest extends BaseTest {
     @TestCaseId("SDK_TC_012")
     public void ShouldThrowErrorForEmptyBusinessCategoryInCreateProject() {
         ProjectRequest project = new ProjectRequest(StringUtils.getCompanyName(), "");
-        ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT,
+        ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT_V1,
                         ConstantStrings.CONTENT_TYPE.getMessage(), project)
                 .then().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);
@@ -64,7 +64,7 @@ public class ProjectTest extends BaseTest {
     @TestCaseId("SDK_TC_012")
     public void ShouldThrowErrorForEmptyNameAndEmptyBusinessCategoryInCreateProject() {
         ProjectRequest project = new ProjectRequest("", "");
-        ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT,
+        ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT_V1,
                         ConstantStrings.CONTENT_TYPE.getMessage(), project)
                 .then().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);
@@ -78,11 +78,11 @@ public class ProjectTest extends BaseTest {
     public void ShouldThrowErrorForDuplicateNameInCreateProject() {
         String projectName = StringUtils.getCompanyName();
         ProjectRequest project = new ProjectRequest(projectName, ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
-        restClient.post(PROJECT_SERVICE_ENDPOINT, ConstantStrings.CONTENT_TYPE.getMessage(), project)
+        restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), project)
                 .then().statusCode(HttpStatus.SC_OK);
 
         ProjectRequest duplicateProject = new ProjectRequest(projectName, ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
-        ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT,
+        ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT_V1,
                         ConstantStrings.CONTENT_TYPE.getMessage(), duplicateProject)
                 .then().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);
@@ -93,7 +93,7 @@ public class ProjectTest extends BaseTest {
     @Test(description = "Validate the error message returned when a Create Project request is made without a request body")
     @TestCaseId("SDK_TC_014")
     public void ShouldThrowErrorForEmptyBodyRequestInCreateProject() {
-        ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT,
+        ErrorResponse response = restClient.post(PROJECT_SERVICE_ENDPOINT_V1,
                         ConstantStrings.CONTENT_TYPE.getMessage())
                 .then().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);

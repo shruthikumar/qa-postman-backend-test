@@ -7,8 +7,11 @@ import sdk.enterprise.Base.BaseTest;
 import sdk.enterprise.Client.RestClient;
 import sdk.enterprise.Constants.ConstantStrings;
 import sdk.enterprise.Constants.Constants;
+import sdk.enterprise.Constants.ErrorCodes;
+import sdk.enterprise.Constants.ErrorConstants;
 import sdk.enterprise.CustomAnnotations.TestCaseId;
 import sdk.enterprise.DataProvider.ExcelDataProvider;
+import sdk.enterprise.Entities.ErrorEntities.ErrorResponse;
 import sdk.enterprise.Entities.RequestEntities.*;
 import sdk.enterprise.Entities.ResponseEntities.*;
 import sdk.enterprise.Utils.JsonPathValidator;
@@ -56,7 +59,7 @@ public class ProjectSubmitForReviewTest extends BaseTest {
         ProjectRequest projectRequest = new ProjectRequest(StringUtils.getCompanyName(), ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage()
         );
 
-        ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
+        ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
                 .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(ProjectResponse.class);
 
@@ -78,14 +81,14 @@ public class ProjectSubmitForReviewTest extends BaseTest {
                 .platform(ConstantStrings.PLATFORM.getMessage())
                 .metadata(metadata)
                 .build();
-        CredentialsResponse credentialsResponse = restClient.post(V2_CREDENTIALS, headers, credentialsRequest)
+        CredentialsResponse credentialsResponse = restClient.post(PROJECT_SERVICE_CREDENTIALS_ENDPOINT_V2, headers, credentialsRequest)
                 .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(CredentialsResponse.class);
 
         String clientId = credentialsResponse.getClientId();
 
         // Step 4: Get Credentials
-        String serviceUrl = RestClient.buildPathParamWithServiceUrl(V2_CREDENTIALS, clientId);
+        String serviceUrl = RestClient.buildPathParamWithServiceUrl(PROJECT_SERVICE_CREDENTIALS_ENDPOINT_V2, clientId);
 
         CredentialsResponse getCredentialsResponse = restClient.get(serviceUrl, headers)
                 .then().statusCode(HttpStatus.SC_OK)
@@ -94,7 +97,7 @@ public class ProjectSubmitForReviewTest extends BaseTest {
         assertEquals(getCredentialsResponse.getClientId(), credentialsResponse.getClientId());
 
         // Step 5: Get Project Details by project id
-        DetailsOfAllProjectsResponse projectDetailsResponse = restClient.get(PROJECT_SERVICE_PROJECT_DETAILS_ENDPOINT_V1, headers)
+        DetailsOfAllProjectsResponse projectDetailsResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1, headers)
                 .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(DetailsOfAllProjectsResponse.class);
 
@@ -118,13 +121,13 @@ public class ProjectSubmitForReviewTest extends BaseTest {
 
         String consentJson = JsonPathValidator.convertObjectToJsonString(consentRequest);
 
-        ConsentResponse consentResponse = restClient.postMultiPart(PROJECT_SERVICE_CONSENT_V1, headers, appLogoFile, consentJson)
+        ConsentResponse consentResponse = restClient.postMultiPart(PROJECT_SERVICE_CONSENT_ENDPOINT_V1, headers, appLogoFile, consentJson)
                 .then().statusCode(HttpStatus.SC_CREATED)
                 .extract().as(ConsentResponse.class);
         assertEquals(consentResponse.getSummary(), ConstantStrings.CONSENT_SCREEN_SAVED.getMessage());
 
         // Step 7: Fetch consent details
-        ConsentResponse getConsentResponse = restClient.get(PROJECT_SERVICE_CONSENT_V2, headers)
+        ConsentResponse getConsentResponse = restClient.get(PROJECT_SERVICE_CONSENT_ENDPOINT_V2, headers)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().as(ConsentResponse.class);
@@ -144,20 +147,20 @@ public class ProjectSubmitForReviewTest extends BaseTest {
 
         String requestBody = JsonPathValidator.convertObjectToJsonString(testPhoneNumberRequestBody);
 
-        restClient.post(PROJECT_TEST_PHONE_NUMBER, headers, requestBody)
+        restClient.post(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1, headers, requestBody)
                 .then()
                 .statusCode(HttpStatus.SC_CREATED);
 
 
         // Step 9: Get list of phone numbers added to the project
-        String responseBody = restClient.get(PROJECT_TEST_PHONE_NUMBER, headers)
+        String responseBody = restClient.get(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1, headers)
                 .then().statusCode(HttpStatus.SC_OK)
                 .extract().asString();
 
         assertTrue(responseBody.contains(String.valueOf(testPhoneNumberRequestBody.getPhoneNumber())));
 
         // Step 10 : Add Optional Preferences / Enable optional preferences
-        OtpVerificationStatusResponse otpVerificationStatusResponse = restClient.put(V1_OTP_VERIFICATION_ACTIVATE, headers)
+        OtpVerificationStatusResponse otpVerificationStatusResponse = restClient.put(PROJECT_SERVICE_OTP_VERIFICATION_ACTIVATE_ENDPOINT_V1, headers)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
@@ -167,7 +170,7 @@ public class ProjectSubmitForReviewTest extends BaseTest {
         assertEquals(otpVerificationStatusResponse.getStatus(), ConstantStrings.STATUS_ACTIVE.getMessage());
 
         // Step 11: Verification Prepare
-        VerificationPrepareResponse verificationPrepareResponse = restClient.post(V2_VERIFICATION_PREPARE, headers)
+        VerificationPrepareResponse verificationPrepareResponse = restClient.post(PROJECT_SERVICE_VERIFICATION_PREPARE_ENDPOINT_V2, headers)
                 .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(VerificationPrepareResponse.class);
 
@@ -179,9 +182,37 @@ public class ProjectSubmitForReviewTest extends BaseTest {
                 .partnerComments(StringUtils.getRandomParagraph())
                 .build();
 
-        restClient.post(V2_VERIFICATION_SUBMIT, headers, optionalPreferencesRequestBody)
+        restClient.post(PROJECT_SERVICE_VERIFICATION_SUBMIT_ENDPOINT_V2, headers, optionalPreferencesRequestBody)
                 .then()
                 .statusCode(HttpStatus.SC_OK);
     }
-}
 
+    @Test(description = "Business should not be able to submit a project for review without developer details and other mandatory information")
+    @TestCaseId("SDK_TS_2")
+    public void shouldThrowErrorForMissingMandatoryFieldsInCreateProject() {
+
+        // Step 1: Create a new project with only minimal details (no dev info or credentials)
+        ProjectRequest projectRequest = new ProjectRequest(
+                StringUtils.getCompanyName(),
+                ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
+
+        ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
+                .then().statusCode(HttpStatus.SC_OK)
+                .extract()
+                .as(ProjectResponse.class);
+
+        String projectId = projectResponse.getId();
+
+        // Step 2: Attempt to prepare project for verification review
+        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId);
+
+        ErrorResponse errorResponse = restClient.post(PROJECT_SERVICE_VERIFICATION_PREPARE_ENDPOINT_V2, headers)
+                .then()
+                .statusCode(HttpStatus.SC_NOT_FOUND)
+                .extract()
+                .as(ErrorResponse.class);
+
+        assertEquals(errorResponse.getMessage(), ErrorConstants.CONSENT_SCREEN_DETAILS_NOT_FOUND_MSG);
+        assertEquals(errorResponse.getStatus(), ErrorCodes.CONSENT_SCREEN_DETAILS_NOT_FOUND_ERROR_CODE);
+    }
+}
