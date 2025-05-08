@@ -4,9 +4,11 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '30 3,10 * * *'
+
+permissions: write-all
+
 env:
   BUILD_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
 
 jobs:
   test:
@@ -50,6 +52,24 @@ jobs:
         with:
           name: sdk-allure-reports
           path: allure-results
+
+      - name: Set up Allure
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Allure CLI
+        run: npm install -g allure-commandline --save-dev
+
+      - name: Generate Allure Report
+        run: |
+          allure generate allure-results --clean -o target/allure-report
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/allure-report
 
       - name: Send build success notification
         if: ${{ success() }}
