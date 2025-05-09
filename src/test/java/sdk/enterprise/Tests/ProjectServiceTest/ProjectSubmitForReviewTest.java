@@ -124,7 +124,7 @@ public class ProjectSubmitForReviewTest extends BaseTest {
         ConsentResponse consentResponse = restClient.postMultiPart(PROJECT_SERVICE_CONSENT_ENDPOINT_V1, headers, appLogoFile, consentJson)
                 .then().statusCode(HttpStatus.SC_CREATED)
                 .extract().as(ConsentResponse.class);
-        assertEquals(consentResponse.getSummary(), ConstantStrings.CONSENT_SCREEN_SAVED.getMessage());
+        assertEquals(consentResponse.getSummary(), Constants.CONSENT_SCREEN_SAVED);
 
         // Step 7: Fetch consent details
         ConsentResponse getConsentResponse = restClient.get(PROJECT_SERVICE_CONSENT_ENDPOINT_V2, headers)

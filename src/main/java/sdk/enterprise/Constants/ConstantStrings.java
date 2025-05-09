@@ -10,10 +10,11 @@ public enum ConstantStrings {
     PASSWORD("PASSWORD"),
     PORTAL("developers_portal"),
     PLATFORM("Android"),
-    MODE("test"),
+    TEST_MODE("test"),
+    REVIEW_MODE("ready_to_review"),
+    PRODUCTION_MODE("production"),
     STATUS_ACTIVE("active"),
-    CONSENT_SCREEN_SAVED("Consent screen saved");
-
+    STATUS_INACTIVE("inactive");
 
     private final String message;
 

@@ -10,4 +10,5 @@ public class Constants {
     public static final String MIME_TYPE_PNG = "image/png";
     public static final String APP_LOGO_FILE_NAME = "file.png";
     public static final String TC_URL = "https://truecaller.net/";
+    public static final String CONSENT_SCREEN_SAVED = "Consent screen saved";
 };
