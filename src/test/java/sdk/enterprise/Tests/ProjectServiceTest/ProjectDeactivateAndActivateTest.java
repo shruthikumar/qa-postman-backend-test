@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 import sdk.enterprise.Base.BaseTest;
 import sdk.enterprise.Client.RestClient;
 import sdk.enterprise.Constants.ConstantStrings;
+import sdk.enterprise.CustomAnnotations.TestCaseId;
 import sdk.enterprise.Entities.RequestEntities.ProjectRequest;
 import sdk.enterprise.Entities.ResponseEntities.DetailsOfAllProjectsResponse;
 import sdk.enterprise.Entities.ResponseEntities.ProjectResponse;
@@ -21,8 +22,8 @@ public class ProjectDeactivateAndActivateTest extends BaseTest {
     public void setUp() {
         restClient = new RestClient(prop, baseURI);
     }
-
     @Test(description = "Business should be able to deactivate and activate a project in TEST mode")
+    @TestCaseId("SDK_TS_3")
     public void businessShouldBeAbleToDeactivateAndActivateProjectInTestMode() {
         // Step 1: Create a new project in TEST mode
         ProjectRequest projectRequest = new ProjectRequest(
@@ -71,6 +72,7 @@ public class ProjectDeactivateAndActivateTest extends BaseTest {
     }
 
     @Test(description = "Business should be able to deactivate and activate a project in REVIEW mode")
+    @TestCaseId("SDK_TS_4")
     public void businessShouldBeAbleToDeactivateAndActivateProjectInReviewMode() {
         Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("projectIdInReview"));
 
@@ -106,6 +108,7 @@ public class ProjectDeactivateAndActivateTest extends BaseTest {
     }
 
     @Test(description = "Business should be able to deactivate and activate a project in PRODUCTION mode")
+    @TestCaseId("SDK_TS_5")
     public void businessShouldBeAbleToDeactivateAndActivateProjectInProductionMode() {
         Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("projectIdInProduction"));
 
