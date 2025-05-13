@@ -16,6 +16,7 @@ jobs:
     env:
       EMAIL: ${{ secrets.EMAIL }}
       PASSWORD: ${{ secrets.PASSWORD }}
+      LOGIN_URL: "https://partner-account-noneu.truecaller.com/v1/account/login"
 
     steps:
       - name: Checkout Repository

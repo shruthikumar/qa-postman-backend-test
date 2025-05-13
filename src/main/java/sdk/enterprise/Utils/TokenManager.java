@@ -10,8 +10,6 @@ import static io.restassured.RestAssured.given;
 
 public class TokenManager {
     private static volatile String token;
-    private static final String LOGIN_URI = "https://partner-account-noneu.truecaller.com/v1/account/login";
-
 
     public static String getToken() {
         if (token == null) {
@@ -27,11 +25,12 @@ public class TokenManager {
     protected static String fetchBearerToken() {
         String email = System.getenv(ConstantStrings.EMAIL.getMessage());
         String password = System.getenv(ConstantStrings.PASSWORD.getMessage());
+        String loginUrl = System.getenv(ConstantStrings.LOGIN_URL.getMessage());
 
-        if (email != null && password != null) {
+        if (email != null && password != null && loginUrl != null) {
             LoginRequest loginRequest = new LoginRequest(email, password, ConstantStrings.PORTAL.getMessage());
             token = given().log().all().contentType(ContentType.JSON).body(loginRequest).when()
-                    .post(LOGIN_URI)
+                    .post(loginUrl)
                     .then().log().all().assertThat().statusCode(HttpStatus.SC_OK).extract().path("token");
         }
         return token;

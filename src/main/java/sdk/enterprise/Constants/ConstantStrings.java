@@ -14,6 +14,7 @@ public enum ConstantStrings {
     REVIEW_MODE("ready_to_review"),
     PRODUCTION_MODE("production"),
     STATUS_ACTIVE("active"),
+    LOGIN_URL("LOGIN_URL"),
     STATUS_INACTIVE("inactive");
 
     private final String message;
