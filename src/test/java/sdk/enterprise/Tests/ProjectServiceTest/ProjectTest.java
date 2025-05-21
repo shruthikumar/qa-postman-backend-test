@@ -139,4 +139,3 @@ public class ProjectTest extends BaseTest {
         assertEquals(response.getMessage(), ErrorConstants.INVALID_PROJECT_ID_MSG);
     }
 }
-

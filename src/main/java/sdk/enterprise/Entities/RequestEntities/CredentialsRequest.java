@@ -14,6 +14,7 @@ import java.util.List;
 public class CredentialsRequest {
     private String platform;
     private Metadata metadata;
+    private String clientId;
 
     @Data
     @AllArgsConstructor

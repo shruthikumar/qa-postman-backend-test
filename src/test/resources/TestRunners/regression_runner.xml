@@ -35,4 +35,10 @@
             <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectDeactivateAndActivateTest"/>
         </classes>
     </test>
+    <test name="ProjectCredentialsTest">
+        <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
+        <classes>
+            <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectCredentialsTest"/>
+        </classes>
+    </test>
 </suite>

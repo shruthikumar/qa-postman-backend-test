@@ -23,6 +23,7 @@ public class BaseTest {
     public static final String PROJECT_SERVICE_VERIFICATION_SUBMIT_ENDPOINT_V2 =  "/v2/verification/submit";
     public static final String PROJECT_SERVICE_DEACTIVATE_ENDPOINT_V1 = "/v1/project/deactivate";
     public static final String PROJECT_SERVICE_ACTIVATE_ENDPOINT_V1 = "/v1/project/activate";
+    public static final String PROJECT_SERVICE_CREDENTIALS_ENDPOINT_V1 = "/v1/credentials";
 
     protected ConfigurationManager config;
     protected Properties prop;
