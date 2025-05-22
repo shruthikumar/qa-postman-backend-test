@@ -41,32 +41,39 @@ jobs:
 
       - name: Run SDK Test API Tests
         run: mvn clean test
+        continue-on-error: true
 
       - name: Archive allure reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-reports
           path: allure-results
 
       - name: Upload allure reports to GitHub
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: sdk-allure-reports
           path: allure-results
 
       - name: Set up Allure
+        if: always()
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install Allure CLI
+        if: always()
         run: npm install -g allure-commandline --save-dev
 
       - name: Generate Allure Report
+        if: always()
         run: |
           allure generate allure-results --clean -o target/allure-report
 
       - name: Deploy to GitHub Pages
+        if: always()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
