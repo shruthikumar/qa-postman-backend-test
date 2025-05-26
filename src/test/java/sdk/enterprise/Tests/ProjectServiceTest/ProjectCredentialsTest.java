@@ -9,6 +9,7 @@ import sdk.enterprise.Constants.ConstantStrings;
 import sdk.enterprise.Constants.Constants;
 import sdk.enterprise.CustomAnnotations.TestCaseId;
 import sdk.enterprise.Entities.RequestEntities.CredentialsRequest;
+import sdk.enterprise.Entities.RequestEntities.FingerPrintRequest;
 import sdk.enterprise.Entities.RequestEntities.ProjectRequest;
 import sdk.enterprise.Entities.RequestEntities.UpdateCredentialRequest;
 import sdk.enterprise.Entities.ResponseEntities.CredentialsResponse;
@@ -153,6 +154,65 @@ public class ProjectCredentialsTest extends BaseTest {
 
         // Assertion for the updated fingerprint
         assertThat(getUpdatedCredentialsResponse.getMetadata().getFingerPrints().stream().findFirst().get().getFingerPrint(),
-                equalTo(updateCredentialRequest.getNewFingerPrint()));;
+                equalTo(updateCredentialRequest.getNewFingerPrint()));
+    }
+
+    @Test(description = "Business should be able to create credentials, add new fingerprint and delete fingerprint in TEST mode")
+    @TestCaseId("SDK_TS_8")
+    public void businessShouldBeAbleAddAndDeleteFingerprintSuccessfullyInTestMode() {
+        // Step 1: Create a new project in TEST mode
+        ProjectRequest projectRequest = new ProjectRequest(
+                StringUtils.getCompanyName(),
+                ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
+        ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
+                .then().statusCode(HttpStatus.SC_OK)
+                .extract().as(ProjectResponse.class);
+        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectResponse.getId());
+
+        // Step 2: Add initial Android credentials with a fingerprint
+        CredentialsRequest.Fingerprint initialFingerprint = new CredentialsRequest.Fingerprint(
+                StringUtils.getRandomFingerprint(),
+                StringUtils.getRandomLabel());
+
+        CredentialsRequest.Metadata metadata = new CredentialsRequest.Metadata(
+                StringUtils.getPackageName(),
+                Arrays.asList(initialFingerprint));
+
+        CredentialsRequest credentialsRequest = CredentialsRequest.builder()
+                .platform(ConstantStrings.PLATFORM.getMessage())
+                .metadata(metadata)
+                .build();
+
+        CredentialsResponse credentialsResponse = restClient.post(PROJECT_SERVICE_CREDENTIALS_ENDPOINT_V2, headers, credentialsRequest)
+                .then().statusCode(HttpStatus.SC_OK)
+                .extract().as(CredentialsResponse.class);
+
+        String serviceUrl = RestClient.buildPathParamWithServiceUrl(PROJECT_SERVICE_CREDENTIALS_ENDPOINT_V2, credentialsResponse.getClientId());
+        String serviceUrlWithPathParam = RestClient.buildPathParamWithServiceUrl(PROJECT_SERVICE_CREDENTIALS_ENDPOINT_V1, credentialsResponse.getClientId(), Constants.FINGERPRINT_PROPERTY);
+
+        //Step 3: Add another fingerprint to the credentials
+        FingerPrintRequest addAnotherFingerPrintRequest = FingerPrintRequest.builder()
+                .fingerPrint(StringUtils.getRandomFingerprint())
+                .label(StringUtils.getRandomLabel()).build();
+
+        restClient.post(serviceUrlWithPathParam, headers, addAnotherFingerPrintRequest)
+                .then().statusCode(HttpStatus.SC_NO_CONTENT);
+
+        // Step 4: Delete the fingerprint of the credentials
+        FingerPrintRequest fingerPrintRequest = FingerPrintRequest.builder()
+                .fingerPrint(initialFingerprint.getFingerPrint())
+                .build();
+
+        restClient.delete(serviceUrlWithPathParam, fingerPrintRequest, headers)
+                .then().statusCode(HttpStatus.SC_NO_CONTENT);
+
+        // Step 5: Get the updated credentials
+        CredentialsResponse getUpdatedCredentialsResponse = restClient.get(serviceUrl, headers)
+                .then().statusCode(HttpStatus.SC_OK)
+                .extract().as(CredentialsResponse.class);
+
+        // Assertion for the added fingerprint
+        assertThat(getUpdatedCredentialsResponse.getMetadata().getFingerPrints().stream().findFirst().get().getFingerPrint(),
+                equalTo(addAnotherFingerPrintRequest.getFingerPrint()));
     }
 }

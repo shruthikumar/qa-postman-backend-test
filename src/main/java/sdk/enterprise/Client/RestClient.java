@@ -452,6 +452,18 @@ public class RestClient {
     }
 
     /**
+     * Http Util for delete call with service url
+     *
+     * @param serviceUrl serviceUrl takes url in the form of String
+     * @param headersMap takes header map in the form of key and value
+     * @param requestBody takes request body in the form of object
+     * @return Response object
+     */
+    public Response delete(String serviceUrl, Object requestBody, Map<String, String> headersMap) {
+        return given(createRequestSpec(requestBody, headersMap)).when().delete(serviceUrl);
+    }
+
+    /**
      * Fetch the login token currently all the details are fetched property file . Use only to test the local changes
      * Note : This function is used to fetch the token in local and request data is fetched from Property file
      *
