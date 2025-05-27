@@ -15,7 +15,8 @@ public enum ConstantStrings {
     PRODUCTION_MODE("production"),
     STATUS_ACTIVE("active"),
     LOGIN_URL("LOGIN_URL"),
-    STATUS_INACTIVE("inactive");
+    STATUS_INACTIVE("inactive"),
+    BUSINESS_CATEGORY_REALTY("REALTY");
 
     private final String message;
 
