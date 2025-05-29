@@ -139,7 +139,7 @@ public class ProjectTest extends BaseTest {
                 .statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .extract().as(ErrorResponse.class);
         assertEquals(response.getStatus(), ErrorCodes.INVALID_PROJECT_ID_ERROR_CODE);
-        assertEquals(response.getMessage(), ErrorConstants.INVALID_PROJECT_ID_MSG);
+        assertEquals(response.getMessage(), ErrorConstants.INVALID_PROJECT_ID_ERROR_MSG);
     }
 
     @Test(description = "Update Business Category with valid request body")
@@ -181,7 +181,7 @@ public class ProjectTest extends BaseTest {
                 .statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .extract().as(ErrorResponse.class);
         assertEquals(updateCategoryResponse.getStatus(), ErrorCodes.INVALID_PROJECT_ID_ERROR_CODE);
-        assertEquals(updateCategoryResponse.getMessage(), ErrorConstants.INVALID_PROJECT_ID_MSG);
+        assertEquals(updateCategoryResponse.getMessage(), ErrorConstants.INVALID_PROJECT_ID_ERROR_MSG);
     }
 
     @Test(description = "Validate the Error Message for Invalid Business Category in Update Business Category")

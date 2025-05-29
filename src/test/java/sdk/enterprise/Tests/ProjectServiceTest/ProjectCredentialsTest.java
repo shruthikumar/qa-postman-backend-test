@@ -7,7 +7,10 @@ import sdk.enterprise.Base.BaseTest;
 import sdk.enterprise.Client.RestClient;
 import sdk.enterprise.Constants.ConstantStrings;
 import sdk.enterprise.Constants.Constants;
+import sdk.enterprise.Constants.ErrorCodes;
+import sdk.enterprise.Constants.ErrorConstants;
 import sdk.enterprise.CustomAnnotations.TestCaseId;
+import sdk.enterprise.Entities.ErrorEntities.ErrorResponse;
 import sdk.enterprise.Entities.RequestEntities.CredentialsRequest;
 import sdk.enterprise.Entities.RequestEntities.FingerPrintRequest;
 import sdk.enterprise.Entities.RequestEntities.ProjectRequest;
@@ -159,7 +162,7 @@ public class ProjectCredentialsTest extends BaseTest {
 
     @Test(description = "Business should be able to create credentials, add new fingerprint and delete fingerprint in TEST mode")
     @TestCaseId("SDK_TS_8")
-    public void businessShouldBeAbleAddAndDeleteFingerprintSuccessfullyInTestMode() {
+    public void businessShouldBeAbleToAddAndDeleteFingerprintSuccessfullyInTestMode() {
         // Step 1: Create a new project in TEST mode
         ProjectRequest projectRequest = new ProjectRequest(
                 StringUtils.getCompanyName(),
@@ -214,5 +217,53 @@ public class ProjectCredentialsTest extends BaseTest {
         // Assertion for the added fingerprint
         assertThat(getUpdatedCredentialsResponse.getMetadata().getFingerPrints().stream().findFirst().get().getFingerPrint(),
                 equalTo(addAnotherFingerPrintRequest.getFingerPrint()));
+    }
+
+    @Test(description = "Business should be able to create and delete credentials in TEST mode")
+    @TestCaseId("SDK_TS_9")
+    public void businessShouldBeAbleToCreateAndDeleteCredentialsInTestMode() {
+        // Step 1: Create a new project in TEST mode
+        ProjectRequest projectRequest = new ProjectRequest(
+                StringUtils.getCompanyName(),
+                ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
+        ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
+                .then().statusCode(HttpStatus.SC_OK)
+                .extract().as(ProjectResponse.class);
+        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectResponse.getId());
+
+        // Step 2: Add Android credentials with a fingerprint
+        CredentialsRequest.Fingerprint fingerprint = new CredentialsRequest.Fingerprint(
+                StringUtils.getRandomFingerprint(),
+                StringUtils.getRandomLabel());
+
+        CredentialsRequest.Metadata metadata = new CredentialsRequest.Metadata(
+                StringUtils.getPackageName(),
+                Arrays.asList(fingerprint));
+
+        CredentialsRequest credentialsRequest = CredentialsRequest.builder()
+                .platform(ConstantStrings.PLATFORM.getMessage())
+                .metadata(metadata)
+                .build();
+
+        CredentialsResponse credentialsResponse = restClient.post(PROJECT_SERVICE_CREDENTIALS_ENDPOINT_V2, headers, credentialsRequest)
+                .then().statusCode(HttpStatus.SC_OK)
+                .extract().as(CredentialsResponse.class);
+
+        String serviceUrlV1 = RestClient.buildPathParamWithServiceUrl(PROJECT_SERVICE_CREDENTIALS_ENDPOINT_V1, credentialsResponse.getClientId());
+        String serviceUrlV2 = RestClient.buildPathParamWithServiceUrl(PROJECT_SERVICE_CREDENTIALS_ENDPOINT_V2, credentialsResponse.getClientId());
+
+        // Step 3: Delete the credentials
+        restClient.delete(serviceUrlV1, headers)
+                .then().statusCode(HttpStatus.SC_OK);
+
+        // Step 4: Verify the credentials are deleted
+        ErrorResponse errorResponse = restClient.get(serviceUrlV2, headers)
+                .then()
+                .statusCode(HttpStatus.SC_FORBIDDEN)
+                .extract()
+                .as(ErrorResponse.class);
+
+        assertEquals(errorResponse.getMessage(), ErrorConstants.INVALID_CREDENTIALS_ERROR_MSG);
+        assertEquals(errorResponse.getStatus(), ErrorCodes.INVALID_CREDENTIALS_ERROR_CODE);
     }
 }

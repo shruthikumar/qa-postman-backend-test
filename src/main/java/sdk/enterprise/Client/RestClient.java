@@ -456,6 +456,17 @@ public class RestClient {
      *
      * @param serviceUrl serviceUrl takes url in the form of String
      * @param headersMap takes header map in the form of key and value
+     * @return Response object
+     */
+    public Response delete(String serviceUrl, Map<String, String> headersMap) {
+        return given(createRequestSpec(headersMap)).when().delete(serviceUrl);
+    }
+
+    /**
+     * Http Util for delete call with service url
+     *
+     * @param serviceUrl serviceUrl takes url in the form of String
+     * @param headersMap takes header map in the form of key and value
      * @param requestBody takes request body in the form of object
      * @return Response object
      */
