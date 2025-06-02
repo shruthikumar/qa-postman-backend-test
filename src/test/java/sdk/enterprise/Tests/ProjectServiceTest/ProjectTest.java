@@ -13,13 +13,16 @@ import sdk.enterprise.CustomAnnotations.TestCaseId;
 import sdk.enterprise.Entities.ErrorEntities.ErrorResponse;
 import sdk.enterprise.Entities.RequestEntities.CategoryUpdateRequest;
 import sdk.enterprise.Entities.RequestEntities.ProjectRequest;
+import sdk.enterprise.Entities.RequestEntities.TestPhoneNumberRequest;
 import sdk.enterprise.Entities.ResponseEntities.CategoryUpdateResponse;
 import sdk.enterprise.Entities.ResponseEntities.DetailsOfAllProjectsResponse;
 import sdk.enterprise.Entities.ResponseEntities.ProjectResponse;
 import sdk.enterprise.Utils.StringUtils;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import static sdk.enterprise.Utils.StringUtils.capitalise;
+import static sdk.enterprise.Utils.StringUtils.getRandomMobileNumber;
 
 public class ProjectTest extends BaseTest {
 
@@ -159,7 +162,7 @@ public class ProjectTest extends BaseTest {
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().as(CategoryUpdateResponse.class);
-        Assert.assertTrue(updateCategoryResponse.isUpdated());
+        assertTrue(updateCategoryResponse.isUpdated());
 
         DetailsOfAllProjectsResponse getAllProjectResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1,
                         restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
@@ -224,5 +227,64 @@ public class ProjectTest extends BaseTest {
                 .extract().as(ErrorResponse.class);
         assertEquals(errorResponse.getStatus(), ErrorCodes.EMPTY_NAME_ERROR_CODE);
         assertEquals(errorResponse.getMessage(), ErrorConstants.EMPTY_NAME_ERROR__MSG);
+    }
+
+    @Test(description = "Add mobile number to the specific project and validate the added Phone number")
+    @TestCaseId("SDK_TC_035")
+    public void businessShouldBeAbleToAddTestPhoneNumberToProject() {
+        //Step - 1 : Create Project
+        ProjectRequest projectRequest = new ProjectRequest(StringUtils.getCompanyName(), ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
+        ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().as(ProjectResponse.class);
+        String projectId = projectResponse.getId();
+
+        //Step - 2 :Add Test Phone number to Project
+        TestPhoneNumberRequest testPhoneNumberRequestBody = TestPhoneNumberRequest.builder()
+                .phoneNumber(getRandomMobileNumber())
+                .build();
+        restClient.post(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId), testPhoneNumberRequestBody)
+                .then()
+                .statusCode(HttpStatus.SC_CREATED);
+
+        //Step - 3 : Fetch the phone Number which was added
+        String phoneNumberResponseBody = restClient.get(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().asString();
+        assertTrue(phoneNumberResponseBody.contains(String.valueOf(testPhoneNumberRequestBody.getPhoneNumber())));
+    }
+
+    @Test(description = "Verify an error response when exceeding max test phone numbers")
+    @TestCaseId("SDK_TC_036")
+    public void shouldThrowErrorWhenExceedingMaxTestPhoneNumbers() {
+        TestPhoneNumberRequest testPhoneNumberRequest = TestPhoneNumberRequest.builder()
+                .phoneNumber(getRandomMobileNumber())
+                .build();
+        ErrorResponse errorResponse = restClient.post(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("maxPhoneNumberLimitProjectId")), testPhoneNumberRequest)
+                .then()
+                .statusCode(HttpStatus.SC_FORBIDDEN)
+                .extract().as(ErrorResponse.class);
+        assertEquals(errorResponse.getStatus(), ErrorCodes.PHONE_NUMBER_LIMIT_EXCEEDED_ERROR_CODE);
+        assertEquals(errorResponse.getMessage(), ErrorConstants.PHONE_NUMBER_LIMIT_EXCEEDED_ERROR_MSG);
+    }
+
+    @Test(description = "Verify an error response with Invalid project ID")
+    @TestCaseId("SDK_TC_037")
+    public void ShouldThrowAnErrorForInvalidProjectIdInAddTestPhoneNumbers() {
+        TestPhoneNumberRequest testPhoneNumberRequestBody = TestPhoneNumberRequest.builder()
+                .phoneNumber(getRandomMobileNumber())
+                .build();
+        ErrorResponse errorResponse = restClient.post(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")), testPhoneNumberRequestBody)
+                .then()
+                .statusCode(HttpStatus.SC_UNAUTHORIZED)
+                .extract().as(ErrorResponse.class);
+        assertEquals(errorResponse.getStatus(), ErrorCodes.INVALID_PROJECT_ID_PHONE_NUMBER_ERROR_CODE);
+        assertEquals(errorResponse.getMessage(), ErrorConstants.INVALID_PROJECT_ID_ERROR_MSG);
     }
 }

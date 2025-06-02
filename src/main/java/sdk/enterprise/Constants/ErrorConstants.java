@@ -8,4 +8,5 @@ public class ErrorConstants {
     public static final String CONSENT_SCREEN_DETAILS_NOT_FOUND_MSG = "Consent screen details not found";
     public static final String INVALID_PROJECT_ID_ERROR_MSG = "Invalid project id";
     public static final String INVALID_CREDENTIALS_ERROR_MSG = "Invalid credentials";
+    public static final String PHONE_NUMBER_LIMIT_EXCEEDED_ERROR_MSG = "Limit of 20 phone numbers reached";
 }
