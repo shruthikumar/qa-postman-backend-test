@@ -19,6 +19,7 @@ public class CredentialsRequest {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @Builder
     public static class Metadata {
         private String packageName;
         private List<Fingerprint> fingerPrints;
@@ -27,6 +28,7 @@ public class CredentialsRequest {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @Builder
     public static class Fingerprint {
         private String fingerPrint;
         private String label;

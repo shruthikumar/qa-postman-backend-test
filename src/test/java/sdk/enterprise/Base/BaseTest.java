@@ -25,6 +25,7 @@ public class BaseTest {
     public static final String PROJECT_SERVICE_ACTIVATE_ENDPOINT_V1 = "/v1/project/activate";
     public static final String PROJECT_SERVICE_CREDENTIALS_ENDPOINT_V1 = "/v1/credentials";
     public static final String PROJECT_SERVICE_CATEGORY_ENDPOINT_V1 = "/v1/project/category";
+    public static final String PROJECT_SERVICE_OTP_VERIFICATION_DEACTIVATE_V1 = "/v1/otp/verification/deactivate";
 
     protected ConfigurationManager config;
     protected Properties prop;
