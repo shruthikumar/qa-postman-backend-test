@@ -15,6 +15,7 @@ import sdk.enterprise.Entities.RequestEntities.CategoryUpdateRequest;
 import sdk.enterprise.Entities.RequestEntities.ProjectRequest;
 import sdk.enterprise.Entities.RequestEntities.TestPhoneNumberRequest;
 import sdk.enterprise.Entities.ResponseEntities.CategoryUpdateResponse;
+import sdk.enterprise.Entities.ResponseEntities.DeactivateProjectResponse;
 import sdk.enterprise.Entities.ResponseEntities.DetailsOfAllProjectsResponse;
 import sdk.enterprise.Entities.ResponseEntities.ProjectResponse;
 import sdk.enterprise.Utils.StringUtils;
@@ -286,5 +287,59 @@ public class ProjectTest extends BaseTest {
                 .extract().as(ErrorResponse.class);
         assertEquals(errorResponse.getStatus(), ErrorCodes.INVALID_PROJECT_ID_PHONE_NUMBER_ERROR_CODE);
         assertEquals(errorResponse.getMessage(), ErrorConstants.INVALID_PROJECT_ID_ERROR_MSG);
+    }
+
+    @Test(description = "Deactivate the Project which is in Active Status")
+    @TestCaseId("SDK_TC_028")
+    public void businessShouldBeAbleToDeactivateProject() {
+        ProjectRequest projectRequest = new ProjectRequest(StringUtils.getCompanyName(), ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
+        ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
+                .then().statusCode(HttpStatus.SC_OK)
+                .extract().as(ProjectResponse.class);
+        String projectId = projectResponse.getId();
+
+        DeactivateProjectResponse deactivateProjectResponse = restClient.put(PROJECT_SERVICE_DEACTIVATE_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().as(DeactivateProjectResponse.class);
+        assertEquals(deactivateProjectResponse.isDeactivated(), true);
+    }
+
+    @Test(description = "Validate the Error Message for Invalid ProjectId in Deactivate Project")
+    @TestCaseId("SC_TC_029")
+    public void ShouldThrowErrorForInvalidProjectIdInDeactivateProject() {
+        ErrorResponse errorResponse = restClient.put(PROJECT_SERVICE_DEACTIVATE_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")))
+                .then()
+                .statusCode(HttpStatus.SC_UNAUTHORIZED)
+                .extract().as(ErrorResponse.class);
+        assertEquals(errorResponse.getStatus(), ErrorCodes.INVALID_PROJECT_ID_ERROR_CODE);
+        assertEquals(errorResponse.getMessage(), ErrorConstants.INVALID_PROJECT_ID_MSG);
+    }
+
+    @Test(description = "Validate the error message for the deactivated project")
+    @TestCaseId("SDK_TC_030")
+    public void shouldThrowErrorForWhenProjectIsAlreadyDeactivated(){
+        ProjectRequest projectRequest = new ProjectRequest(StringUtils.getCompanyName(), ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
+        ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
+                .then().statusCode(HttpStatus.SC_OK)
+                .extract().as(ProjectResponse.class);
+        String projectId = projectResponse.getId();
+
+        DeactivateProjectResponse deactivateProjectResponse = restClient.put(PROJECT_SERVICE_DEACTIVATE_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().as(DeactivateProjectResponse.class);
+        assertEquals(deactivateProjectResponse.isDeactivated(), true);
+
+        ErrorResponse errorResponse = restClient.put(PROJECT_SERVICE_DEACTIVATE_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                .then()
+                .statusCode(HttpStatus.SC_FORBIDDEN)
+                .extract().as(ErrorResponse.class);
+        assertEquals(errorResponse.getStatus(), ErrorCodes.INVALID_PROJECT_STATUS_ERROR_CODE);
+        assertEquals(errorResponse.getMessage(), ErrorConstants.INVALID_PROJECT_STATUS_MSG);
     }
 }

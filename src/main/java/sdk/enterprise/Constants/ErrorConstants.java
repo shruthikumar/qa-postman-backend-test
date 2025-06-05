@@ -9,4 +9,6 @@ public class ErrorConstants {
     public static final String INVALID_PROJECT_ID_ERROR_MSG = "Invalid project id";
     public static final String INVALID_CREDENTIALS_ERROR_MSG = "Invalid credentials";
     public static final String PHONE_NUMBER_LIMIT_EXCEEDED_ERROR_MSG = "Limit of 20 phone numbers reached";
+    public static final String INVALID_PROJECT_ID_MSG = "Invalid project id";
+    public static final String INVALID_PROJECT_STATUS_MSG = "Invalid project status";
 }
