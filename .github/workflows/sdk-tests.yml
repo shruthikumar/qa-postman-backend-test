@@ -41,7 +41,6 @@ jobs:
 
       - name: Run SDK Test API Tests
         run: mvn clean test
-        continue-on-error: true
 
       - name: Archive allure reports
         if: always()
@@ -79,6 +78,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./target/allure-report
 
+
       - name: Send build success notification
         if: ${{ success() }}
         uses: slackapi/slack-github-action@v1.24.0
@@ -88,13 +88,35 @@ jobs:
           channel-id: C04KT3VL9TK
           payload: >
             {
-              "attachments": [
-                {
-                  "color": "good",
-                  "text": "SDK APIs Automation Test is Passed: \n${{ env.BUILD_URL }}."
-                }
-              ]
-            }
+                 "text": ":white_check_mark: *Build Succeeded!*",
+                 "attachments": [
+                   {
+                     "color": "good",
+                     "blocks": [
+                       {
+                         "type": "section",
+                         "text": {
+                           "type": "mrkdwn",
+                           "text": ":white_check_mark: *Build Succeeded! : SDK API Automation Passed * \n*Repository:* `${{ github.repository }}`\n*Branch:* `${{ github.ref_name }}`"
+                         }
+                       },
+                       {
+                         "type": "context",
+                         "elements": [
+                           {
+                             "type": "mrkdwn",
+                             "text": "Triggered by: `${{ github.actor }}`"
+                           },
+                           {
+                             "type": "mrkdwn",
+                             "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow Logs>"
+                           }
+                         ]
+                       }
+                     ]
+                   }
+                 ]
+               }
 
       - name: Notify Slack on Error
         if: ${{ failure() && !cancelled() }}
@@ -105,10 +127,36 @@ jobs:
           channel-id: C04KT3VL9TK
           payload: >
             {
-              "attachments": [
-                {
-                  "color": "red",
-                  "text": "SDK APIs Automation Test is failed: \n${{ env.BUILD_URL }}."
-                }
-              ]
+              "text": ":x: *Build Failed!*",
+                  "attachments": [
+                        {
+                          "color": "danger",
+                          "blocks": [
+                              {
+                               "type": "section",
+                                "text": {
+                                  "type": "mrkdwn",
+                                   "text": ":x: *Build Failed! : SDK API Automation Failed * <@U0495KFP44C> <@U08J3M5B2FN> \n*Repository:* `${{ github.repository }}`\n*Branch:* `${{ github.ref_name }}`"
+                                    }
+                                    },
+                                {
+                                  "type": "context",
+                                    "elements": [
+                                      {
+                                      "type": "mrkdwn",
+                                      "text": "Triggered by: `${{ github.actor }}`"
+                                        },
+                                      {
+                                        "type": "mrkdwn",
+                                        "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow Logs>"
+                                      }
+                                    ]
+                                    }
+                                    ]
+                                    }
+                                ]
             }
+
+
+
+
