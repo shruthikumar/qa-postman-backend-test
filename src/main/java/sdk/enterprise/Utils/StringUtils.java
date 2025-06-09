@@ -2,10 +2,12 @@ package sdk.enterprise.Utils;
 
 import com.github.javafaker.Faker;
 import org.apache.commons.io.FileUtils;
+import sdk.enterprise.Constants.ConstantStrings;
 import sdk.enterprise.Constants.Constants;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Random;
 
 public class StringUtils {
     private static final Faker faker = new Faker();
@@ -19,8 +21,10 @@ public class StringUtils {
     public static String getFirstName() {
         return faker.name().firstName();
     }
-  /**
+
+    /**
      * Returns a File object for a file located in src/test/resources or src/main/resources.
+     *
      * @param fileName name of the file with relative path (e.g., "data/sample.png")
      * @return File object
      */
@@ -80,10 +84,17 @@ public class StringUtils {
     public static String getRandomParagraph() {
         return faker.lorem().paragraph();
     }
+
     public static String capitalise(String input) {
         if (input == null || input.isEmpty()) {
             return input;
         }
         return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
+    }
+
+    public static String getRandomBusinessCategory() {
+        ConstantStrings.BusinessCategory[] values = ConstantStrings.BusinessCategory.values();
+        int randomIndex = new Random().nextInt(values.length);
+        return values[randomIndex].name();
     }
 }

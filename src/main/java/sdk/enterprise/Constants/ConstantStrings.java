@@ -27,6 +27,36 @@ public enum ConstantStrings {
     public String getMessage() {
         return message;
     }
+
+    public enum BusinessCategory {
+        BFSI,
+        EDTECH,
+        GAMING,
+        REALTY,
+        FINTECH,
+        GROCERY,
+        AGRITECH,
+        B2B_TOOLS,
+        PARENTING,
+        ECOMMERCE,
+        HEALTHCARE,
+        HOME_DECOR,
+        JOB_PORTALS,
+        NBU_COMMERCE,
+        NEWS_MEDIA,
+        URBAN_COMMUTE,
+        FANTASY_SPORTS,
+        FASHION_COMMERCE,
+        COUPONS_REWARDS,
+        FOOD_BEVERAGES,
+        STREAMING_SERVICES,
+        TRAVEL_TICKETING,
+        UTILITY_SUPER_APPS,
+        CLASSIFIEDS_VENDORS,
+        HYPERLOCAL_ONDEMAND,
+        AUTO_MARKETPLACES_OEM,
+        MOVIES_EVENT_LISTINGS,
+        SOCIAL_CONTENT_PLATFORMS,
+        LOGISTICS;
+    }
 }
-
-
