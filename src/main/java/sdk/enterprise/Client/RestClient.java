@@ -136,10 +136,11 @@ public class RestClient {
      * @param segments The individual path segments to be joined together.
      * @return A normalized URL path starting with a single
      */
-    public static String buildPathParamWithServiceUrl(String serviceUrl,String... segments) {
+    public static String buildPathParamWithServiceUrl(String serviceUrl, Object... segments) {
         StringBuilder path = new StringBuilder();
-        for (String segment : segments) {
-            if (segment != null) {
+        for (Object segmentObject : segments) { // Changed to Object
+            if (segmentObject != null) {
+                String segment = String.valueOf(segmentObject); // Convert Object to String
                 segment = segment.replaceAll("^/+", "").replaceAll("/+$", "");
                 path.append("/").append(segment);
             }

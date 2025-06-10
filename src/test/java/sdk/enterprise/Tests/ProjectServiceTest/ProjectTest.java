@@ -320,7 +320,7 @@ public class ProjectTest extends BaseTest {
 
     @Test(description = "Validate the error message for the deactivated project")
     @TestCaseId("SDK_TC_030")
-    public void shouldThrowErrorForWhenProjectIsAlreadyDeactivated(){
+    public void shouldThrowErrorForWhenProjectIsAlreadyDeactivated() {
         ProjectRequest projectRequest = new ProjectRequest(StringUtils.getCompanyName(), ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
         ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
                 .then().statusCode(HttpStatus.SC_OK)
@@ -340,6 +340,100 @@ public class ProjectTest extends BaseTest {
                 .statusCode(HttpStatus.SC_FORBIDDEN)
                 .extract().as(ErrorResponse.class);
         assertEquals(errorResponse.getStatus(), ErrorCodes.INVALID_PROJECT_STATUS_ERROR_CODE);
-        assertEquals(errorResponse.getMessage(), ErrorConstants.INVALID_PROJECT_STATUS_MSG);
+        assertEquals(errorResponse.getMessage(), ErrorConstants.INVALID_PROJECT_STATUS_ERROR_MSG);
+    }
+
+    @Test(description = "Validate Delete phone number from the project")
+    @TestCaseId("SDK_TC_041")
+    public void businessShouldBeAbleToDeleteTestPhoneNumberFromProject() {
+        //Step 1 : Create Project
+        ProjectRequest projectRequest = new ProjectRequest(StringUtils.getCompanyName(), ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
+        ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().as(ProjectResponse.class);
+        String projectId = projectResponse.getId();
+
+        //Step 2 :Add Test Phone number to Project
+        TestPhoneNumberRequest testPhoneNumberRequestBody = TestPhoneNumberRequest.builder()
+                .phoneNumber(getRandomMobileNumber())
+                .build();
+        restClient.post(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId), testPhoneNumberRequestBody)
+                .then()
+                .statusCode(HttpStatus.SC_CREATED);
+
+        //Step 3 : Verify the phone Number which was added
+        String fetchPhoneNumberResponseBody = restClient.get(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().asString();
+        assertTrue(fetchPhoneNumberResponseBody.contains(String.valueOf(testPhoneNumberRequestBody.getPhoneNumber())));
+
+        //Step 4: Delete The phone number
+        String serviceUrl = RestClient.buildPathParamWithServiceUrl(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1, testPhoneNumberRequestBody.getPhoneNumber());
+        Boolean deletePhoneNumberResponse = restClient.delete(serviceUrl, restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().as(Boolean.class);
+        Assert.assertTrue(deletePhoneNumberResponse);
+    }
+
+    @Test(description = "Validate an Error Message to Delete the same Phone Number more than once")
+    @TestCaseId("SDK_TC_043")
+    public void shouldThrowWhenDeletingPhoneNumberMultipleTimes() {
+        //Step 1 : Create Project
+        ProjectRequest projectRequest = new ProjectRequest(StringUtils.getCompanyName(), ConstantStrings.BUSINESS_CATEGORY_GAMING.getMessage());
+        ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().as(ProjectResponse.class);
+        String projectId = projectResponse.getId();
+
+        //Step 2 :Add Test Phone number to Project
+        TestPhoneNumberRequest testPhoneNumberRequestBody = TestPhoneNumberRequest.builder()
+                .phoneNumber(getRandomMobileNumber())
+                .build();
+        restClient.post(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId), testPhoneNumberRequestBody)
+                .then()
+                .statusCode(HttpStatus.SC_CREATED);
+
+        //Step 3 : Verify the phone Number which was added
+        String fetchPhoneNumberResponseBody = restClient.get(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
+                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().asString();
+        assertTrue(fetchPhoneNumberResponseBody.contains(String.valueOf(testPhoneNumberRequestBody.getPhoneNumber())));
+
+        //Step 4: Delete The phone number
+        String serviceUrl = RestClient.buildPathParamWithServiceUrl(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1, testPhoneNumberRequestBody.getPhoneNumber());
+        Boolean deletePhoneNumberResponse = restClient.delete(serviceUrl, restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().as(Boolean.class);
+        Assert.assertTrue(deletePhoneNumberResponse);
+
+        //Step 5: Delete Same Number again
+        ErrorResponse errorResponse = restClient.delete(serviceUrl, restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                .then()
+                .statusCode(HttpStatus.SC_NOT_FOUND)
+                .extract().as(ErrorResponse.class);
+        assertEquals(errorResponse.getStatus(), ErrorCodes.INVALID_PHONE_NUMBER_ERROR_CODE);
+        assertEquals(errorResponse.getMessage(), ErrorConstants.INVALID_PHONE_NUMBER_ERROR_MSG);
+    }
+
+    @Test(description = "Validate Error Message for Invalid Project Id In delete test Phone Number")
+    @TestCaseId("SDK_TC_044")
+    public void shouldThrowAnErrorForInvalidProjectIdInDeleteTestPhoneNumber() {
+        String serviceUrl = RestClient.buildPathParamWithServiceUrl(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1, getRandomMobileNumber());
+        ErrorResponse errorResponse = restClient.delete(serviceUrl, restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")))
+                .then()
+                .statusCode(HttpStatus.SC_UNAUTHORIZED)
+                .extract().as(ErrorResponse.class);
+        assertEquals(errorResponse.getStatus(), ErrorCodes.INVALID_PROJECT_ID_PHONE_NUMBER_ERROR_CODE);
+        assertEquals(errorResponse.getMessage(), ErrorConstants.INVALID_PROJECT_ID_MSG);
     }
 }

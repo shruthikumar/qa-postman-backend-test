@@ -10,4 +10,5 @@ public class ErrorCodes {
     public static final Integer INVALID_PROJECT_ID_PHONE_NUMBER_ERROR_CODE = 40111;
     public static final Integer INVALID_CREDENTIALS_ERROR_CODE = 40304;
     public static final Integer INVALID_PROJECT_STATUS_ERROR_CODE = 40307;
+    public static final Integer INVALID_PHONE_NUMBER_ERROR_CODE = 40405;
 }
