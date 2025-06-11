@@ -78,12 +78,33 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./target/allure-report
 
+      - name: Extract failed tests from Allure results
+        if: failure()
+        run: |
+          mkdir -p tmp
+          grep 'test-method .*status="FAIL"' target/surefire-reports/testng-results.xml | \
+          sed -n 's/.*name="\([^"]*\)".*/\1/p' > tmp/failures.txt
+
+          if [ ! -s tmp/failures.txt ]; then
+            echo "None" > tmp/failures.txt
+          fi
+
+          echo "Contents of tmp/failures.txt:"
+          cat tmp/failures.txt
+
+      - name: Prepare Failed Test Cases Content
+        if: failure()
+        id: prepare_content # Give this step an ID to reference its outputs
+        run: |
+          ESCAPED_CONTENT=$(sed 's/"/\\"/g' tmp/failures.txt | sed ':a;N;$!ba;s/\n/\\n/g')
+          echo "failed_test_list=$ESCAPED_CONTENT" >> $GITHUB_OUTPUT
 
       - name: Send build success notification
         if: ${{ success() }}
         uses: slackapi/slack-github-action@v1.24.0
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_COLOR: '#00FF00'
         with:
           channel-id: C04KT3VL9TK
           payload: >
@@ -91,7 +112,7 @@ jobs:
                  "text": ":white_check_mark: *Build Succeeded!*",
                  "attachments": [
                    {
-                     "color": "good",
+                     "color": "#00FF00",
                      "blocks": [
                        {
                          "type": "section",
@@ -113,8 +134,13 @@ jobs:
                            }
                          ]
                        }
-                     ]
-                   }
+                    ]
+                   },
+                  {
+                    "color": "#00FF00",
+                    "text": "* Allure Report ! 📊* \n<https://miniature-succotash-rwwgqwv.pages.github.io/| View Allure Report>",
+                    "thumb_url": "https://avatars.githubusercontent.com/u/5879127?s=200&v=4"
+                  }
                  ]
                }
 
@@ -123,6 +149,7 @@ jobs:
         uses: slackapi/slack-github-action@v1.24.0
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_COLOR: '#FF0000'
         with:
           channel-id: C04KT3VL9TK
           payload: >
@@ -130,7 +157,7 @@ jobs:
               "text": ":x: *Build Failed!*",
                   "attachments": [
                         {
-                          "color": "danger",
+                          "color": "#FF0000",
                           "blocks": [
                               {
                                "type": "section",
@@ -139,6 +166,13 @@ jobs:
                                    "text": ":x: *Build Failed! : SDK API Automation Failed * <@U0495KFP44C> <@U08J3M5B2FN> \n*Repository:* `${{ github.repository }}`\n*Branch:* `${{ github.ref_name }}`"
                                     }
                                     },
+                                {
+                                  "type": "section",
+                                  "text": {
+                                    "type": "mrkdwn",
+                                      "text": ":x: *Failed Test Cases :*\n```${{steps.prepare_content.outputs.failed_test_list}}```"
+                                      }
+                                      },
                                 {
                                   "type": "context",
                                     "elements": [
@@ -153,8 +187,14 @@ jobs:
                                     ]
                                     }
                                     ]
-                                    }
-                                ]
+                                    },
+                            {
+                              "color": "#FF0000",
+                              "text": "* Allure Report 📊* \n<https://miniature-succotash-rwwgqwv.pages.github.io/| View Allure Report>",
+                              "thumb_url": "https://avatars.githubusercontent.com/u/5879127?s=200&v=4"
+                            }
+                          ]
+            
             }
 
 
