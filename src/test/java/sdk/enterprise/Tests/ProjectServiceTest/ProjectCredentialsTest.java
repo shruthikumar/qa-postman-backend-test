@@ -50,13 +50,15 @@ public class ProjectCredentialsTest extends BaseTest {
         Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId);
 
         // Step 2: Add initial Android credentials with a fingerprint
-        CredentialsRequest.Fingerprint fingerprint = new CredentialsRequest.Fingerprint(
-                StringUtils.getRandomFingerprint(),
-                StringUtils.getRandomLabel());
+        CredentialsRequest.Fingerprint fingerprint = CredentialsRequest.Fingerprint.builder()
+                .fingerPrint(StringUtils.getRandomFingerprint())
+                .label(StringUtils.getRandomLabel())
+                .build();
 
-        CredentialsRequest.Metadata metadata = new CredentialsRequest.Metadata(
-                StringUtils.getPackageName(),
-                Arrays.asList(fingerprint));
+        CredentialsRequest.Metadata metadata = CredentialsRequest.Metadata.builder()
+                .packageName(StringUtils.getPackageName())
+                .fingerPrints(Arrays.asList(fingerprint))
+                .build();
 
         CredentialsRequest credentialsRequest = CredentialsRequest.builder()
                 .platform(ConstantStrings.PLATFORM.getMessage())

@@ -69,18 +69,21 @@ public class ProjectSubmitForReviewTest extends BaseTest {
         // Step 3: Add Android Credentials
         Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId);
 
-        CredentialsRequest.Fingerprint fingerprint = new CredentialsRequest.Fingerprint(
-                StringUtils.getRandomFingerprint(),
-                StringUtils.getRandomLabel()
-        );
-        CredentialsRequest.Metadata metadata = new CredentialsRequest.Metadata(
-                StringUtils.getPackageName(),
-                Arrays.asList(fingerprint)
-        );
+        CredentialsRequest.Fingerprint fingerprint = CredentialsRequest.Fingerprint.builder()
+                .fingerPrint(StringUtils.getRandomFingerprint())
+                .label(StringUtils.getRandomLabel())
+                .build();
+
+        CredentialsRequest.Metadata metadata = CredentialsRequest.Metadata.builder()
+                .packageName(StringUtils.getPackageName())
+                .fingerPrints(Arrays.asList(fingerprint))
+                .build();
+
         CredentialsRequest credentialsRequest = CredentialsRequest.builder()
                 .platform(ConstantStrings.PLATFORM.getMessage())
                 .metadata(metadata)
                 .build();
+
         CredentialsResponse credentialsResponse = restClient.post(PROJECT_SERVICE_CREDENTIALS_ENDPOINT_V2, headers, credentialsRequest)
                 .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(CredentialsResponse.class);
