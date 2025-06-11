@@ -57,7 +57,7 @@ public class RestClient {
      * @param value takes key as String
      * @return headers Map
      */
-    public Map<String, String> getHeaders(String key, String value) {
+    public Map<String, String> setHeader(String key, String value) {
         Map<String, String> headers = new HashMap<>();
         headers.put(key, value);
         return headers;

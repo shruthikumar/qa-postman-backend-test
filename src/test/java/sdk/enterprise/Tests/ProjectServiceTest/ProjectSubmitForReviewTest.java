@@ -67,7 +67,7 @@ public class ProjectSubmitForReviewTest extends BaseTest {
         String projectName = projectRequest.getName();
 
         // Step 3: Add Android Credentials
-        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId);
+        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId);
 
         CredentialsRequest.Fingerprint fingerprint = CredentialsRequest.Fingerprint.builder()
                 .fingerPrint(StringUtils.getRandomFingerprint())
@@ -207,7 +207,7 @@ public class ProjectSubmitForReviewTest extends BaseTest {
         String projectId = projectResponse.getId();
 
         // Step 2: Attempt to prepare project for verification review
-        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId);
+        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId);
 
         ErrorResponse errorResponse = restClient.post(PROJECT_SERVICE_VERIFICATION_PREPARE_ENDPOINT_V2, headers)
                 .then()

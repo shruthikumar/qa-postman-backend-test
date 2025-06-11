@@ -122,7 +122,7 @@ public class ProjectTest extends BaseTest {
         String projectID = projectResponse.getId();
 
         DetailsOfAllProjectsResponse response = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectID))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectID))
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().as(DetailsOfAllProjectsResponse.class);
@@ -138,7 +138,7 @@ public class ProjectTest extends BaseTest {
     @TestCaseId("SDK_TC_017")
     public void shouldThrowAnErrorForInvalidProjectIdInGetProjectDetails() {
         ErrorResponse response = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")))
                 .then()
                 .statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .extract().as(ErrorResponse.class);
@@ -159,14 +159,14 @@ public class ProjectTest extends BaseTest {
         CategoryUpdateRequest updateCategoryRequest = new CategoryUpdateRequest(ConstantStrings.BUSINESS_CATEGORY_REALTY.getMessage());
         CategoryUpdateResponse updateCategoryResponse = restClient.put(PROJECT_SERVICE_CATEGORY_ENDPOINT_V1,
                         ConstantStrings.CONTENT_TYPE.getMessage(), updateCategoryRequest,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().as(CategoryUpdateResponse.class);
         assertTrue(updateCategoryResponse.isUpdated());
 
         DetailsOfAllProjectsResponse getAllProjectResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().as(DetailsOfAllProjectsResponse.class);
@@ -180,7 +180,7 @@ public class ProjectTest extends BaseTest {
         CategoryUpdateRequest updateCategoryRequest = new CategoryUpdateRequest(ConstantStrings.BUSINESS_CATEGORY_REALTY.getMessage());
         ErrorResponse updateCategoryResponse = restClient.put(PROJECT_SERVICE_CATEGORY_ENDPOINT_V1,
                         ConstantStrings.CONTENT_TYPE.getMessage(), updateCategoryRequest,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")))
                 .then()
                 .statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .extract().as(ErrorResponse.class);
@@ -201,7 +201,7 @@ public class ProjectTest extends BaseTest {
         CategoryUpdateRequest updateCategoryRequest = new CategoryUpdateRequest(ConstantStrings.TEST_MODE.getMessage());
         ErrorResponse errorResponse = restClient.put(PROJECT_SERVICE_CATEGORY_ENDPOINT_V1,
                         ConstantStrings.CONTENT_TYPE.getMessage(), updateCategoryRequest,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);
@@ -222,7 +222,7 @@ public class ProjectTest extends BaseTest {
         CategoryUpdateRequest updateCategoryRequest = new CategoryUpdateRequest(null);
         ErrorResponse errorResponse = restClient.put(PROJECT_SERVICE_CATEGORY_ENDPOINT_V1,
                         ConstantStrings.CONTENT_TYPE.getMessage(), updateCategoryRequest,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().as(ErrorResponse.class);
@@ -246,13 +246,13 @@ public class ProjectTest extends BaseTest {
                 .phoneNumber(getRandomMobileNumber())
                 .build();
         restClient.post(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId), testPhoneNumberRequestBody)
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId), testPhoneNumberRequestBody)
                 .then()
                 .statusCode(HttpStatus.SC_CREATED);
 
         //Step - 3 : Fetch the phone Number which was added
         String phoneNumberResponseBody = restClient.get(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().asString();
@@ -266,7 +266,7 @@ public class ProjectTest extends BaseTest {
                 .phoneNumber(getRandomMobileNumber())
                 .build();
         ErrorResponse errorResponse = restClient.post(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("maxPhoneNumberLimitProjectId")), testPhoneNumberRequest)
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("maxPhoneNumberLimitProjectId")), testPhoneNumberRequest)
                 .then()
                 .statusCode(HttpStatus.SC_FORBIDDEN)
                 .extract().as(ErrorResponse.class);
@@ -281,7 +281,7 @@ public class ProjectTest extends BaseTest {
                 .phoneNumber(getRandomMobileNumber())
                 .build();
         ErrorResponse errorResponse = restClient.post(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")), testPhoneNumberRequestBody)
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")), testPhoneNumberRequestBody)
                 .then()
                 .statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .extract().as(ErrorResponse.class);
@@ -299,7 +299,7 @@ public class ProjectTest extends BaseTest {
         String projectId = projectResponse.getId();
 
         DeactivateProjectResponse deactivateProjectResponse = restClient.put(PROJECT_SERVICE_DEACTIVATE_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().as(DeactivateProjectResponse.class);
@@ -310,7 +310,7 @@ public class ProjectTest extends BaseTest {
     @TestCaseId("SC_TC_029")
     public void ShouldThrowErrorForInvalidProjectIdInDeactivateProject() {
         ErrorResponse errorResponse = restClient.put(PROJECT_SERVICE_DEACTIVATE_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")))
                 .then()
                 .statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .extract().as(ErrorResponse.class);
@@ -328,14 +328,14 @@ public class ProjectTest extends BaseTest {
         String projectId = projectResponse.getId();
 
         DeactivateProjectResponse deactivateProjectResponse = restClient.put(PROJECT_SERVICE_DEACTIVATE_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().as(DeactivateProjectResponse.class);
         assertEquals(deactivateProjectResponse.isDeactivated(), true);
 
         ErrorResponse errorResponse = restClient.put(PROJECT_SERVICE_DEACTIVATE_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_FORBIDDEN)
                 .extract().as(ErrorResponse.class);
@@ -359,13 +359,13 @@ public class ProjectTest extends BaseTest {
                 .phoneNumber(getRandomMobileNumber())
                 .build();
         restClient.post(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId), testPhoneNumberRequestBody)
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId), testPhoneNumberRequestBody)
                 .then()
                 .statusCode(HttpStatus.SC_CREATED);
 
         //Step 3 : Verify the phone Number which was added
         String fetchPhoneNumberResponseBody = restClient.get(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().asString();
@@ -373,7 +373,7 @@ public class ProjectTest extends BaseTest {
 
         //Step 4: Delete The phone number
         String serviceUrl = RestClient.buildPathParamWithServiceUrl(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1, testPhoneNumberRequestBody.getPhoneNumber());
-        Boolean deletePhoneNumberResponse = restClient.delete(serviceUrl, restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+        Boolean deletePhoneNumberResponse = restClient.delete(serviceUrl, restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().as(Boolean.class);
@@ -396,13 +396,13 @@ public class ProjectTest extends BaseTest {
                 .phoneNumber(getRandomMobileNumber())
                 .build();
         restClient.post(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId), testPhoneNumberRequestBody)
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId), testPhoneNumberRequestBody)
                 .then()
                 .statusCode(HttpStatus.SC_CREATED);
 
         //Step 3 : Verify the phone Number which was added
         String fetchPhoneNumberResponseBody = restClient.get(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1,
-                        restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+                        restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().asString();
@@ -410,14 +410,14 @@ public class ProjectTest extends BaseTest {
 
         //Step 4: Delete The phone number
         String serviceUrl = RestClient.buildPathParamWithServiceUrl(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1, testPhoneNumberRequestBody.getPhoneNumber());
-        Boolean deletePhoneNumberResponse = restClient.delete(serviceUrl, restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+        Boolean deletePhoneNumberResponse = restClient.delete(serviceUrl, restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().as(Boolean.class);
         Assert.assertTrue(deletePhoneNumberResponse);
 
         //Step 5: Delete Same Number again
-        ErrorResponse errorResponse = restClient.delete(serviceUrl, restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId))
+        ErrorResponse errorResponse = restClient.delete(serviceUrl, restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId))
                 .then()
                 .statusCode(HttpStatus.SC_NOT_FOUND)
                 .extract().as(ErrorResponse.class);
@@ -429,7 +429,7 @@ public class ProjectTest extends BaseTest {
     @TestCaseId("SDK_TC_044")
     public void shouldThrowAnErrorForInvalidProjectIdInDeleteTestPhoneNumber() {
         String serviceUrl = RestClient.buildPathParamWithServiceUrl(PROJECT_SERVICE_TEST_PHONE_NUMBER_ENDPOINT_V1, getRandomMobileNumber());
-        ErrorResponse errorResponse = restClient.delete(serviceUrl, restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")))
+        ErrorResponse errorResponse = restClient.delete(serviceUrl, restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("invalidProjectId")))
                 .then()
                 .statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .extract().as(ErrorResponse.class);

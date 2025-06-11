@@ -36,7 +36,7 @@ public class ProjectOptionalPreferencesTest extends BaseTest {
                 .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(ProjectResponse.class);
         String projectId = projectResponse.getId();
-        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId);
+        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId);
 
         // Step 2: Add initial Android credentials
         CredentialsRequest.Fingerprint fingerprint = CredentialsRequest.Fingerprint.builder()

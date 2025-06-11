@@ -37,7 +37,7 @@ public class ProjectDeactivateAndActivateTest extends BaseTest {
                 .extract().as(ProjectResponse.class);
 
         String projectId = projectResponse.getId();
-        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId);
+        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId);
 
         // Step 2: Verify initial project status is ACTIVE
         DetailsOfAllProjectsResponse initialDetailsResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1, headers)
@@ -74,7 +74,7 @@ public class ProjectDeactivateAndActivateTest extends BaseTest {
     @Test(description = "Business should be able to deactivate and activate a project in REVIEW mode")
     @TestCaseId("SDK_TS_4")
     public void businessShouldBeAbleToDeactivateAndActivateProjectInReviewMode() {
-        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("projectIdInReview"));
+        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("projectIdInReview"));
 
         // Step 1: Verify initial project status is ACTIVE
         DetailsOfAllProjectsResponse initialDetailsResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1, headers)
@@ -110,7 +110,7 @@ public class ProjectDeactivateAndActivateTest extends BaseTest {
     @Test(description = "Business should be able to deactivate and activate a project in PRODUCTION mode")
     @TestCaseId("SDK_TS_5")
     public void businessShouldBeAbleToDeactivateAndActivateProjectInProductionMode() {
-        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("projectIdInProduction"));
+        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("projectIdInProduction"));
 
         // Step 1: Verify initial project status is ACTIVE
         DetailsOfAllProjectsResponse initialDetailsResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1, headers)

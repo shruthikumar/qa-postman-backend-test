@@ -41,7 +41,7 @@ public class ProjectConsentDetailsTest extends BaseTest {
                 .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(ProjectResponse.class);
 
-        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectResponse.getId());
+        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectResponse.getId());
 
         // Step 2: Create consent details for the project
         File appLogoFile = getFileFromResources(Constants.APP_LOGO_FILE_NAME);

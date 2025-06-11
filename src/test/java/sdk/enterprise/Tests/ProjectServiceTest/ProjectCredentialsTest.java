@@ -47,7 +47,7 @@ public class ProjectCredentialsTest extends BaseTest {
                 .extract().as(ProjectResponse.class);
 
         String projectId = projectResponse.getId();
-        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId);
+        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId);
 
         // Step 2: Add initial Android credentials with a fingerprint
         CredentialsRequest.Fingerprint fingerprint = CredentialsRequest.Fingerprint.builder()
@@ -115,7 +115,7 @@ public class ProjectCredentialsTest extends BaseTest {
                 .extract().as(ProjectResponse.class);
 
         String projectId = projectResponse.getId();
-        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectId);
+        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectId);
 
         // Step 2: Add initial Android credentials with a fingerprint
         CredentialsRequest.Fingerprint initialFingerprint = new CredentialsRequest.Fingerprint(
@@ -172,7 +172,7 @@ public class ProjectCredentialsTest extends BaseTest {
         ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
                 .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(ProjectResponse.class);
-        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectResponse.getId());
+        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectResponse.getId());
 
         // Step 2: Add initial Android credentials with a fingerprint
         CredentialsRequest.Fingerprint initialFingerprint = new CredentialsRequest.Fingerprint(
@@ -231,7 +231,7 @@ public class ProjectCredentialsTest extends BaseTest {
         ProjectResponse projectResponse = restClient.post(PROJECT_SERVICE_ENDPOINT_V1, ConstantStrings.CONTENT_TYPE.getMessage(), projectRequest)
                 .then().statusCode(HttpStatus.SC_OK)
                 .extract().as(ProjectResponse.class);
-        Map<String, String> headers = restClient.getHeaders(ConstantStrings.PROJECT_ID.getMessage(), projectResponse.getId());
+        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), projectResponse.getId());
 
         // Step 2: Add Android credentials with a fingerprint
         CredentialsRequest.Fingerprint fingerprint = new CredentialsRequest.Fingerprint(
