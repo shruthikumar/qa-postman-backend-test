@@ -6,57 +6,57 @@
 
     <listeners>
         <listener
-                class-name="sdk.enterprise.Listeners.ExtentReportListener"/>
+                class-name="com.truecaller.enterprise.sdk.Listeners.ExtentReportListener"/>
     </listeners>
 
     <test name="PartnerServiceTest">
         <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
         <classes>
-            <class name="sdk.enterprise.Tests.PartnerServiceTest.PartnerTest"/>
+            <class name="com.truecaller.enterprise.sdk.Tests.PartnerServiceTest.PartnerTest"/>
         </classes>
     </test>
 
     <test name="ProjectSubmitForReviewTest">
         <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
         <classes>
-            <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectSubmitForReviewTest"/>
+            <class name="com.truecaller.enterprise.sdk.Tests.ProjectServiceTest.ProjectSubmitForReviewTest"/>
         </classes>
     </test>
 
     <test name="ProjectServiceTest">
         <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
         <classes>
-            <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectTest"/>
+            <class name="com.truecaller.enterprise.sdk.Tests.ProjectServiceTest.ProjectTest"/>
         </classes>
     </test>
     <test name="ProjectDeactivateAndActivateTest">
         <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
         <classes>
-            <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectDeactivateAndActivateTest"/>
+            <class name="com.truecaller.enterprise.sdk.Tests.ProjectServiceTest.ProjectDeactivateAndActivateTest"/>
         </classes>
     </test>
     <test name="ProjectCredentialsTest">
         <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
         <classes>
-            <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectCredentialsTest"/>
+            <class name="com.truecaller.enterprise.sdk.Tests.ProjectServiceTest.ProjectCredentialsTest"/>
         </classes>
     </test>
     <test name="ProjectConsentDetailsTest">
         <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
         <classes>
-            <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectConsentDetailsTest"/>
+            <class name="com.truecaller.enterprise.sdk.Tests.ProjectServiceTest.ProjectConsentDetailsTest"/>
         </classes>
     </test>
     <test name="ProjectOptionalPreferencesTest">
         <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
         <classes>
-            <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectOptionalPreferencesTest"/>
+            <class name="com.truecaller.enterprise.sdk.Tests.ProjectServiceTest.ProjectOptionalPreferencesTest"/>
         </classes>
     </test>
     <test name="ProjectCategoryTest">
         <parameter name="baseURI" value="https://oauth-account-noneu.truecaller.com/portal"/>
         <classes>
-            <class name="sdk.enterprise.Tests.ProjectServiceTest.ProjectCategoryTest"/>
+            <class name="com.truecaller.enterprise.sdk.Tests.ProjectServiceTest.ProjectCategoryTest"/>
         </classes>
     </test>
 </suite>
