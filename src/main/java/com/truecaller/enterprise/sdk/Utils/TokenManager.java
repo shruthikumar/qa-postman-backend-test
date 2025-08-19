@@ -2,6 +2,7 @@ package com.truecaller.enterprise.sdk.Utils;
 
 import com.truecaller.enterprise.sdk.Constants.ConstantStrings;
 import com.truecaller.enterprise.sdk.Entities.RequestEntities.LoginRequest;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
 
@@ -29,9 +30,9 @@ public class TokenManager {
 
         if (email != null && password != null && loginUrl != null) {
             LoginRequest loginRequest = new LoginRequest(email, password, ConstantStrings.PORTAL.getMessage());
-            token = given().log().all().contentType(ContentType.JSON).body(loginRequest).when()
+            token = given().contentType(ContentType.JSON).body(loginRequest).when()
                     .post(loginUrl)
-                    .then().log().all().assertThat().statusCode(HttpStatus.SC_OK).extract().path("token");
+                    .then().assertThat().statusCode(HttpStatus.SC_OK).extract().path("token");
         }
         return token;
     }

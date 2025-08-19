@@ -42,18 +42,22 @@ jobs:
       - name: Run SDK Test API Tests
         run: mvn clean test
 
+      - name: Mask Sensitive Data in Allure Results
+        if: always()
+        run: |
+          echo "Masking sensitive data in allure-results..."
+          find allure-results -type f -exec sed -i "s/${EMAIL}/***MASKED_EMAIL***/g" {} +
+          find allure-results -type f -exec sed -i "s/${PASSWORD}/***MASKED_PASSWORD***/g" {} +
+          find allure-results -type f -exec perl -pi -e 's/Bearer\s+[A-Za-z0-9\._-]+/Bearer ***MASKED_TOKEN***/g' {} +
+          find allure-results -type f -exec perl -pi -e 's/"token"\s*:\s*"[A-Za-z0-9\._-]+"/"token":"***MASKED_TOKEN***"/g' {} +
+          find allure-results -type f -name "*.html" -exec \
+          perl -0777 -pi -e 's/&quot;token&quot;\s*:\s*&quot;.*?&quot;/&quot;token&quot;:&quot;***MASKED_TOKEN***&quot;/gs' {} +
+
       - name: Archive allure reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-reports
-          path: allure-results
-
-      - name: Upload allure reports to GitHub
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: sdk-allure-reports
           path: allure-results
 
       - name: Set up Allure
