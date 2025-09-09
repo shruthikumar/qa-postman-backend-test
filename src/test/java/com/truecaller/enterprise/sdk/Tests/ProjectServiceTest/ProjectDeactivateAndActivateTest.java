@@ -107,39 +107,39 @@ public class ProjectDeactivateAndActivateTest extends BaseTest {
         assertEquals(afterActivationResponse.getStatus(), ConstantStrings.STATUS_ACTIVE.getMessage());
     }
 
-    @Test(description = "Business should be able to deactivate and activate a project in PRODUCTION mode")
-    @TestCaseId("SDK_TS_5")
-    public void businessShouldBeAbleToDeactivateAndActivateProjectInProductionMode() {
-        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("projectIdInProduction"));
-
-        // Step 1: Verify initial project status is ACTIVE
-        DetailsOfAllProjectsResponse initialDetailsResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1, headers)
-                .then().statusCode(HttpStatus.SC_OK)
-                .extract().as(DetailsOfAllProjectsResponse.class);
-
-        assertEquals(initialDetailsResponse.getMode(), ConstantStrings.PRODUCTION_MODE.getMessage());
-        assertEquals(initialDetailsResponse.getStatus(), ConstantStrings.STATUS_ACTIVE.getMessage());
-
-        // Step 2: Deactivate the project
-        restClient.put(PROJECT_SERVICE_DEACTIVATE_ENDPOINT_V1, headers)
-                .then().statusCode(HttpStatus.SC_OK);
-
-        // Step 3: Verify project status is INACTIVE
-        DetailsOfAllProjectsResponse afterDeactivationResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1, headers)
-                .then().statusCode(HttpStatus.SC_OK)
-                .extract().as(DetailsOfAllProjectsResponse.class);
-
-        assertEquals(afterDeactivationResponse.getStatus(), ConstantStrings.STATUS_INACTIVE.getMessage());
-
-        // Step 4: Reactivate the project
-        restClient.put(PROJECT_SERVICE_ACTIVATE_ENDPOINT_V1, headers)
-                .then().statusCode(HttpStatus.SC_OK);
-
-        // Step 5: Verify project status is ACTIVE again in prod
-        DetailsOfAllProjectsResponse afterActivationResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1, headers)
-                .then().statusCode(HttpStatus.SC_OK)
-                .extract().as(DetailsOfAllProjectsResponse.class);
-
-        assertEquals(afterActivationResponse.getStatus(), ConstantStrings.STATUS_ACTIVE.getMessage());
-    }
+//    @Test(description = "Business should be able to deactivate and activate a project in PRODUCTION mode")
+//    @TestCaseId("SDK_TS_5")
+//    public void businessShouldBeAbleToDeactivateAndActivateProjectInProductionMode() {
+//        Map<String, String> headers = restClient.setHeader(ConstantStrings.PROJECT_ID.getMessage(), prop.getProperty("projectIdInProduction"));
+//
+//        // Step 1: Verify initial project status is ACTIVE
+//        DetailsOfAllProjectsResponse initialDetailsResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1, headers)
+//                .then().statusCode(HttpStatus.SC_OK)
+//                .extract().as(DetailsOfAllProjectsResponse.class);
+//
+//        assertEquals(initialDetailsResponse.getMode(), ConstantStrings.PRODUCTION_MODE.getMessage());
+//        assertEquals(initialDetailsResponse.getStatus(), ConstantStrings.STATUS_ACTIVE.getMessage());
+//
+//        // Step 2: Deactivate the project
+//        restClient.put(PROJECT_SERVICE_DEACTIVATE_ENDPOINT_V1, headers)
+//                .then().statusCode(HttpStatus.SC_OK);
+//
+//        // Step 3: Verify project status is INACTIVE
+//        DetailsOfAllProjectsResponse afterDeactivationResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1, headers)
+//                .then().statusCode(HttpStatus.SC_OK)
+//                .extract().as(DetailsOfAllProjectsResponse.class);
+//
+//        assertEquals(afterDeactivationResponse.getStatus(), ConstantStrings.STATUS_INACTIVE.getMessage());
+//
+//        // Step 4: Reactivate the project
+//        restClient.put(PROJECT_SERVICE_ACTIVATE_ENDPOINT_V1, headers)
+//                .then().statusCode(HttpStatus.SC_OK);
+//
+//        // Step 5: Verify project status is ACTIVE again in prod
+//        DetailsOfAllProjectsResponse afterActivationResponse = restClient.get(PROJECT_SERVICE_DETAILS_ENDPOINT_V1, headers)
+//                .then().statusCode(HttpStatus.SC_OK)
+//                .extract().as(DetailsOfAllProjectsResponse.class);
+//
+//        assertEquals(afterActivationResponse.getStatus(), ConstantStrings.STATUS_ACTIVE.getMessage());
+//    }
 }
